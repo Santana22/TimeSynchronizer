@@ -11,21 +11,54 @@ import client.ClienteTimeSynchronizer;
  *
  * @author vinicius
  */
-
 public class Controller {
-    
+
     private ClienteTimeSynchronizer cliente = new ClienteTimeSynchronizer();
-    
+
     private Controller() {
     }
-    
+
     public static Controller getInstance() {
         return ControllerHolder.INSTANCE;
     }
-    
+
     private static class ControllerHolder {
+
         private static final Controller INSTANCE = new Controller();
     }
-    
-    
+
+    public void cadastrar(String nome) {
+        this.cliente.cadastrar(nome);
+    }
+
+    public void enviarHora(int hora, int min, int seg) {
+        this.cliente.enviarHora(hora, min, seg);
+    }
+
+    public void elegerCoordenador() {
+        this.cliente.elegerCoordenador();
+    }
+
+    public boolean getAtualizarHora() {
+        return this.cliente.getAtualizarHora();
+    }
+
+    public void setAtualizarHora(boolean valor) {
+        this.cliente.setAtualizarHora(valor);
+    }
+
+    public synchronized int getHora() {
+        return cliente.getHora();
+
+    }
+
+    public synchronized int getMin() {
+        return cliente.getMin();
+
+    }
+
+    public synchronized int getSeg() {
+        return cliente.getSeg();
+
+    }
 }
