@@ -125,23 +125,6 @@ public class Clock extends javax.swing.JFrame {
                     try {
                         long novo = (long) (1000*drift2);
                         
-                        
-                        controller.enviarHora(hora, min, seg);
-                        
-                        if (controller.getAtualizarHora()){
-                            seg = controller.getSeg();
-                            min = controller.getMin();
-                            hora = controller.getHora();
-                            controller.setAtualizarHora(false);
-                            
-                             String hr = hora <= 9 ? "0" + hora : hora + "";
-                        String min2 = min <= 9 ? "0" + min : min + "";
-                        String seg2 = seg <= 9 ? "0" + seg : seg + "";
-
-                        setLabel(hr + ":" + min2 + ":" + seg2);
-                            
-                        }
-                        
                         Thread.sleep(novo);
                         seg = seg + 1;
 
@@ -156,12 +139,31 @@ public class Clock extends javax.swing.JFrame {
                                 }
                             }
                         }
+                        
+                        controller.enviarHora(hora, min, seg);
 
                         String hr = hora <= 9 ? "0" + hora : hora + "";
                         String min2 = min <= 9 ? "0" + min : min + "";
                         String seg2 = seg <= 9 ? "0" + seg : seg + "";
 
                         setLabel(hr + ":" + min2 + ":" + seg2);
+                        
+                        if (controller.getAtualizarHora()){
+                            seg = controller.getSeg();
+                            min = controller.getMin();
+                            hora = controller.getHora();
+                            controller.setAtualizarHora(false);
+//                            controller.setHora(0);
+//                            controller.setMin(0);
+//                            controller.setSeg(0);
+                            
+                            hr = hora <= 9 ? "0" + hora : hora + "";
+                            min2 = min <= 9 ? "0" + min : min + "";
+                            seg2 = seg <= 9 ? "0" + seg : seg + "";
+                            setLabel(hr + ":" + min2 + ":" + seg2);
+                            
+                        }
+                        
                         
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();

@@ -61,4 +61,16 @@ public class Controller {
         return cliente.getSeg();
 
     }
+    
+    public synchronized void setMin(int valor){
+        this.cliente.setMin(valor);
+    }
+    
+    public synchronized void setHora(int valor){
+        this.cliente.setHora(valor);
+    }
+    
+    public synchronized void setSeg(int valor){
+        this.cliente.setSeg(valor);
+    }
 }

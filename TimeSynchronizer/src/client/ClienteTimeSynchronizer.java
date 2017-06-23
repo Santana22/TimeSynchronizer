@@ -64,21 +64,31 @@ public class ClienteTimeSynchronizer {
 
     public synchronized void setAtualizarHora(boolean valor) {
         ClienteTimeSynchronizer.atualizarHora = valor;
-    }
-    
-    public synchronized int getHora(){
         
+    }
+
+    public synchronized int getHora() {
         return ClienteTimeSynchronizer.hora;
-        
     }
-    
-    public synchronized int getMin(){
+
+    public synchronized int getMin() {
         return ClienteTimeSynchronizer.min;
     }
-    
-    public synchronized int getSeg(){
+
+    public synchronized int getSeg() {
         return ClienteTimeSynchronizer.seg;
-        
+    }
+
+    public synchronized void setHora(int valor) {
+        ClienteTimeSynchronizer.hora = valor;
+    }
+
+    public synchronized void setMin(int valor) {
+        ClienteTimeSynchronizer.min = valor;
+    }
+
+    public synchronized void setSeg(int valor) {
+        ClienteTimeSynchronizer.seg = valor;
     }
 
     private class ThreadCliente extends Thread {
@@ -113,7 +123,12 @@ public class ClienteTimeSynchronizer {
                         int min = Integer.parseInt(dadosRecebidos[2].trim());
                         int seg = Integer.parseInt(dadosRecebidos[3].trim());
 
-                        if (hora > ClienteTimeSynchronizer.hora && min > ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg) {
+                        if ((hora > ClienteTimeSynchronizer.hora && min > ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg)
+                                || (hora == ClienteTimeSynchronizer.hora && min > ClienteTimeSynchronizer.min)
+                                || (hora == ClienteTimeSynchronizer.hora && min == ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg)
+                                || (hora > ClienteTimeSynchronizer.hora && min < ClienteTimeSynchronizer.min && seg < ClienteTimeSynchronizer.seg)
+                                || (hora > ClienteTimeSynchronizer.hora && min < ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg)
+                                || hora > ClienteTimeSynchronizer.hora) {
                             ClienteTimeSynchronizer.hora = hora;
                             ClienteTimeSynchronizer.min = min;
                             ClienteTimeSynchronizer.seg = seg;
