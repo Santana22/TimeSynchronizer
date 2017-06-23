@@ -30,6 +30,5 @@ public class ClienteTimeSynchronizer {
             new ThreadCliente(conexao).start();
         } catch (Exception ex) {
         }
-    }
-
+    } 
 }

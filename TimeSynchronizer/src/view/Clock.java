@@ -5,17 +5,31 @@
  */
 package view;
 
+import controller.Controller;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author vinicius
  */
 public class Clock extends javax.swing.JFrame {
 
+    private final Controller controller = Controller.getInstance();
+    private SimpleDateFormat formatador = new SimpleDateFormat("HH:mm:ss");
+    private String hora = JOptionPane.showInputDialog(null, "Digite a hora");
+    String drift = JOptionPane.showInputDialog(null, "Digite o drift desejado");
+
     /**
      * Creates new form Clock
      */
     public Clock() {
         initComponents();
+        
+        clock.setText(hora);
+        iniciarContagem();
     }
 
     /**
@@ -27,26 +41,14 @@ public class Clock extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        sync = new javax.swing.JButton();
-        nosync = new javax.swing.JButton();
         clock = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("TimeSynchronizer");
+        setAutoRequestFocus(false);
+        setResizable(false);
 
-        sync.setText("Sincronizar");
-        sync.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                syncActionPerformed(evt);
-            }
-        });
-
-        nosync.setText("Não Sincronizar");
-        nosync.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nosyncActionPerformed(evt);
-            }
-        });
-
+        clock.setFont(new java.awt.Font("Cantarell", 0, 48)); // NOI18N
         clock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -54,38 +56,21 @@ public class Clock extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(sync, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
-                .addComponent(nosync)
-                .addGap(44, 44, 44))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(88, 88, 88))
+                .addGap(40, 40, 40)
+                .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(47, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(42, Short.MAX_VALUE)
-                .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sync)
-                    .addComponent(nosync))
-                .addGap(48, 48, 48))
+                .addGap(34, 34, 34)
+                .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void syncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_syncActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_syncActionPerformed
-
-    private void nosyncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nosyncActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nosyncActionPerformed
 
     /**
      * @param args the command line arguments
@@ -120,11 +105,63 @@ public class Clock extends javax.swing.JFrame {
                 new Clock().setVisible(true);
             }
         });
+
+    }
+
+    public void iniciarContagem() {
+
+        new Thread() {
+            @Override
+            public void run() {
+
+                String[] inf = hora.split(":");
+
+                int hora = Integer.parseInt(inf[0]);
+                int min = Integer.parseInt(inf[1]);
+                int seg = Integer.parseInt(inf[2]);
+                
+                double drift2 = Double.parseDouble(drift);
+
+                while (true) {
+
+                    try {
+                        long novo = (long) (1000*drift2);
+                        
+                        Thread.sleep(novo);
+                        seg = seg + 1;
+
+                        if (seg > 59) {
+                            seg = 0;
+                            min = min + 1;
+                            if (min > 59) {
+                                min = 0;
+                                hora = hora + 1;
+                                if (hora > 23) {
+                                    hora = 0;
+                                }
+                            }
+                        }
+
+                        String hr = hora <= 9 ? "0" + hora : hora + "";
+                        String min2 = min <= 9 ? "0" + min : min + "";
+                        String seg2 = seg <= 9 ? "0" + seg : seg + "";
+
+                        setLabel(hr + ":" + min2 + ":" + seg2);
+
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+            }
+        }.start();
+    }
+
+    private void setLabel(String texto) {
+        clock.setText(texto);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel clock;
-    private javax.swing.JButton nosync;
-    private javax.swing.JButton sync;
     // End of variables declaration//GEN-END:variables
 }
