@@ -64,7 +64,7 @@ public class ClienteTimeSynchronizer {
 
     public synchronized void setAtualizarHora(boolean valor) {
         ClienteTimeSynchronizer.atualizarHora = valor;
-        
+
     }
 
     public synchronized int getHora() {

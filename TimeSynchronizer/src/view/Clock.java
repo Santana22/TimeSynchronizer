@@ -6,7 +6,6 @@
 package view;
 
 import controller.Controller;
-import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,7 +15,7 @@ import javax.swing.JOptionPane;
 public class Clock extends javax.swing.JFrame {
 
     private final Controller controller = Controller.getInstance();
-    
+
     private String nome = JOptionPane.showInputDialog(null, "Nome da Máquina");
     private String hora = JOptionPane.showInputDialog(null, "Digite a hora");
     private String drift = JOptionPane.showInputDialog(null, "Digite o drift desejado");
@@ -117,14 +116,14 @@ public class Clock extends javax.swing.JFrame {
                 int hora = Integer.parseInt(inf[0]);
                 int min = Integer.parseInt(inf[1]);
                 int seg = Integer.parseInt(inf[2]);
-                
+
                 double drift2 = Double.parseDouble(drift);
 
                 while (true) {
 
                     try {
-                        long novo = (long) (1000*drift2);
-                        
+                        long novo = (long) (1000 * drift2);
+
                         Thread.sleep(novo);
                         seg = seg + 1;
 
@@ -139,7 +138,7 @@ public class Clock extends javax.swing.JFrame {
                                 }
                             }
                         }
-                        
+
                         controller.enviarHora(hora, min, seg);
 
                         String hr = hora <= 9 ? "0" + hora : hora + "";
@@ -147,8 +146,8 @@ public class Clock extends javax.swing.JFrame {
                         String seg2 = seg <= 9 ? "0" + seg : seg + "";
 
                         setLabel(hr + ":" + min2 + ":" + seg2);
-                        
-                        if (controller.getAtualizarHora()){
+
+                        if (controller.getAtualizarHora()) {
                             seg = controller.getSeg();
                             min = controller.getMin();
                             hora = controller.getHora();
@@ -156,15 +155,14 @@ public class Clock extends javax.swing.JFrame {
 //                            controller.setHora(0);
 //                            controller.setMin(0);
 //                            controller.setSeg(0);
-                            
+
                             hr = hora <= 9 ? "0" + hora : hora + "";
                             min2 = min <= 9 ? "0" + min : min + "";
                             seg2 = seg <= 9 ? "0" + seg : seg + "";
                             setLabel(hr + ":" + min2 + ":" + seg2);
-                            
+
                         }
-                        
-                        
+
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
