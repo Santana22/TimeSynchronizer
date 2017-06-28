@@ -132,12 +132,11 @@ public class ClienteTimeSynchronizer {
                             ClienteTimeSynchronizer.hora = hora;
                             ClienteTimeSynchronizer.min = min;
                             ClienteTimeSynchronizer.seg = seg;
-                            ClienteTimeSynchronizer.atualizarHora = true;
+                            ClienteTimeSynchronizer.atualizarHora = true;                            
                         }
-
                     }
 
-                    Thread.sleep(500);
+                    Thread.sleep(100);         
                 }
 
             } catch (Exception exc) {
@@ -145,5 +144,4 @@ public class ClienteTimeSynchronizer {
             }
         }
     }
-
 }
