@@ -16,16 +16,28 @@ public class Clock extends javax.swing.JFrame {
 
     private final Controller controller = Controller.getInstance();
 
-//    private String nome = JOptionPane.showInputDialog(null, "Nome da Máquina");
-    private String hora = JOptionPane.showInputDialog(null, "Digite a hora");
+    private String id = JOptionPane.showInputDialog(null, "Nome da Máquina");
+    private String horaDefinida = JOptionPane.showInputDialog(null, "Digite a hora");
     private String drift = JOptionPane.showInputDialog(null, "Digite o drift desejado");
-
+    private int hora;
+    private int min;
+    private int seg;
+  
     /**
      * Creates new form Clock
      */
     public Clock() {
         initComponents();
-        clock.setText(hora);
+        
+        String[] inf = horaDefinida.split(":");
+        this.hora = Integer.parseInt(inf[0]);
+        this.min = Integer.parseInt(inf[1]);
+        this.seg = Integer.parseInt(inf[2]);
+        
+        controller.cadastrar(id);
+        idvis.setText(id);
+        clock.setText(horaDefinida);
+        executarEleicao();
         iniciarContagem();
     }
 
@@ -39,6 +51,7 @@ public class Clock extends javax.swing.JFrame {
     private void initComponents() {
 
         clock = new javax.swing.JLabel();
+        idvis = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TimeSynchronizer");
@@ -48,22 +61,33 @@ public class Clock extends javax.swing.JFrame {
         clock.setFont(new java.awt.Font("Cantarell", 0, 48)); // NOI18N
         clock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
+        idvis.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        idvis.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        idvis.setText("f");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addGap(41, 41, 41)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(idvis, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addComponent(clock, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(idvis, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(27, Short.MAX_VALUE))
         );
+
+        idvis.getAccessibleContext().setAccessibleName("");
+        idvis.getAccessibleContext().setAccessibleParent(idvis);
 
         pack();
         setLocationRelativeTo(null);
@@ -102,26 +126,19 @@ public class Clock extends javax.swing.JFrame {
                 new Clock().setVisible(true);
             }
         });
-
     }
 
     public void iniciarContagem() {
-
         new Thread() {
             @Override
             public void run() {
-
-                String[] inf = hora.split(":");
-
-                int hora = Integer.parseInt(inf[0]);
-                int min = Integer.parseInt(inf[1]);
-                int seg = Integer.parseInt(inf[2]);
-
+                String[] inf = horaDefinida.split(":");
+                
                 String hr = "";
                 String min2 = "";
                 String seg2 = "";
 
-                double drift2 = Double.parseDouble(drift);
+                double minhaContagem = Double.parseDouble(drift);
 
                 while (true) {
 
@@ -137,15 +154,12 @@ public class Clock extends javax.swing.JFrame {
                     hr = hora <= 9 ? "0" + hora : hora + "";
                     min2 = min <= 9 ? "0" + min : min + "";
                     seg2 = seg <= 9 ? "0" + seg : seg + "";
-
                     setLabel(hr + ":" + min2 + ":" + seg2);
 
                     try {
-                        long novo = (long) (1000 * drift2);
-
+                        long novo = (long) (1000 * minhaContagem);
                         Thread.sleep(novo);
                         seg = seg + 1;
-                        
                         if (seg > 59) {
                             seg = 0;
                             min = min + 1;
@@ -158,8 +172,6 @@ public class Clock extends javax.swing.JFrame {
                             }
                         }
 
-                        
-                        
                         hr = hora <= 9 ? "0" + hora : hora + "";
                         min2 = min <= 9 ? "0" + min : min + "";
                         seg2 = seg <= 9 ? "0" + seg : seg + "";
@@ -174,11 +186,23 @@ public class Clock extends javax.swing.JFrame {
         }.start();
     }
 
+    public void executarEleicao() {
+        if (controller.getLista().size() == 1 || controller.getCoordenador().equals(this.id)) {
+            controller.setCoordenador(id);
+            controller.setHoraCoordenador(this.hora);
+            controller.setMinCoordenador(this.min);
+            controller.setSegCoordenador(this.seg);
+        } else {
+
+        }
+    }
+
     private void setLabel(String texto) {
         clock.setText(texto);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel clock;
+    private javax.swing.JLabel idvis;
     // End of variables declaration//GEN-END:variables
 }

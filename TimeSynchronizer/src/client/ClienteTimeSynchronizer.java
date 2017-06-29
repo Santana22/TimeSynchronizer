@@ -20,9 +20,13 @@ public class ClienteTimeSynchronizer {
     private int porta = 22222;
     private InetAddress endereco;
     private MulticastSocket conexao;
-    private static int hora;
-    private static int min;
-    private static int seg;
+    private static String coordenador = "";
+    private static int horacoordenador;
+    private static int mincoordenador;
+    private static int segcoordenador;
+    private static int horapublica;
+    private static int minpublica;
+    private static int segpublica;
     private static boolean atualizarHora = false;
     private static ArrayList<String> listaNomes = new ArrayList();
 
@@ -45,9 +49,6 @@ public class ClienteTimeSynchronizer {
         }
     }
 
-    public synchronized void elegerCoordenador() {
-    }
-
     public synchronized void enviarHora(int hora, int min, int seg) {
 
         byte dados[] = ("1002" + ";" + hora + ";" + min + ";" + seg).getBytes();
@@ -58,39 +59,77 @@ public class ClienteTimeSynchronizer {
         }
     }
 
+    public synchronized void elegerCoordenador() {
+    }
+
     public synchronized boolean getAtualizarHora() {
         return ClienteTimeSynchronizer.atualizarHora;
     }
 
     public synchronized void setAtualizarHora(boolean valor) {
         ClienteTimeSynchronizer.atualizarHora = valor;
-
     }
 
     public synchronized int getHora() {
-        return ClienteTimeSynchronizer.hora;
+        return ClienteTimeSynchronizer.horapublica;
     }
 
     public synchronized int getMin() {
-        return ClienteTimeSynchronizer.min;
+        return ClienteTimeSynchronizer.minpublica;
     }
 
     public synchronized int getSeg() {
-        return ClienteTimeSynchronizer.seg;
+        return ClienteTimeSynchronizer.segpublica;
     }
 
     public synchronized void setHora(int valor) {
-        ClienteTimeSynchronizer.hora = valor;
+        ClienteTimeSynchronizer.horapublica = valor;
     }
 
     public synchronized void setMin(int valor) {
-        ClienteTimeSynchronizer.min = valor;
+        ClienteTimeSynchronizer.minpublica = valor;
     }
 
     public synchronized void setSeg(int valor) {
-        ClienteTimeSynchronizer.seg = valor;
+        ClienteTimeSynchronizer.segpublica = valor;
     }
 
+    public synchronized String getCoordenador() {
+        return ClienteTimeSynchronizer.coordenador;
+    }
+
+    public synchronized void setCoordenador(String novoCoordenador) {
+        ClienteTimeSynchronizer.coordenador = novoCoordenador;
+    }
+    
+    public synchronized ArrayList<String> getLista(){
+        return ClienteTimeSynchronizer.listaNomes;
+    }
+
+    public synchronized int getHoraCoordenador(){
+        return ClienteTimeSynchronizer.horacoordenador;
+    }
+    
+    public synchronized int getMinCoordenador(){
+        return ClienteTimeSynchronizer.mincoordenador;
+    }
+    
+    public synchronized int getSegCoordenador(){
+        return ClienteTimeSynchronizer.segcoordenador;
+    }
+    
+    public synchronized void setHoraCoordenador(int novaHora){
+        ClienteTimeSynchronizer.horacoordenador = novaHora;
+    }
+    
+    public synchronized void setMinCoordenador(int novoMin){
+        ClienteTimeSynchronizer.horacoordenador = novoMin;
+    }
+    
+    public synchronized void setSegCoordenador(int novoSeg){
+        ClienteTimeSynchronizer.horacoordenador = novoSeg;
+    }
+    
     private class ThreadCliente extends Thread {
 
         private final MulticastSocket minhaConexaoMulticast;
@@ -101,7 +140,6 @@ public class ClienteTimeSynchronizer {
 
         public void run() {
             try {
-
                 while (true) {
                     byte dados[] = new byte[1024];
                     DatagramPacket datagrama = new DatagramPacket(dados, dados.length);
@@ -123,20 +161,20 @@ public class ClienteTimeSynchronizer {
                         int min = Integer.parseInt(dadosRecebidos[2].trim());
                         int seg = Integer.parseInt(dadosRecebidos[3].trim());
 
-                        if ((hora > ClienteTimeSynchronizer.hora && min > ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg)
-                                || (hora == ClienteTimeSynchronizer.hora && min > ClienteTimeSynchronizer.min)
-                                || (hora == ClienteTimeSynchronizer.hora && min == ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg)
-                                || (hora > ClienteTimeSynchronizer.hora && min < ClienteTimeSynchronizer.min && seg < ClienteTimeSynchronizer.seg)
-                                || (hora > ClienteTimeSynchronizer.hora && min < ClienteTimeSynchronizer.min && seg > ClienteTimeSynchronizer.seg)
-                                || hora > ClienteTimeSynchronizer.hora) {
-                            ClienteTimeSynchronizer.hora = hora;
-                            ClienteTimeSynchronizer.min = min;
-                            ClienteTimeSynchronizer.seg = seg;
-                            ClienteTimeSynchronizer.atualizarHora = true;                            
+                        if ((hora > ClienteTimeSynchronizer.horapublica && min > ClienteTimeSynchronizer.minpublica && seg > ClienteTimeSynchronizer.segpublica)
+                                || (hora == ClienteTimeSynchronizer.horapublica && min > ClienteTimeSynchronizer.minpublica)
+                                || (hora == ClienteTimeSynchronizer.horapublica && min == ClienteTimeSynchronizer.minpublica && seg > ClienteTimeSynchronizer.segpublica)
+                                || (hora > ClienteTimeSynchronizer.horapublica && min < ClienteTimeSynchronizer.minpublica && seg < ClienteTimeSynchronizer.segpublica)
+                                || (hora > ClienteTimeSynchronizer.horapublica && min < ClienteTimeSynchronizer.minpublica && seg > ClienteTimeSynchronizer.segpublica)
+                                || hora > ClienteTimeSynchronizer.horapublica) {
+                            ClienteTimeSynchronizer.horapublica = hora;
+                            ClienteTimeSynchronizer.minpublica = min;
+                            ClienteTimeSynchronizer.segpublica = seg;
+                            ClienteTimeSynchronizer.atualizarHora = true;
                         }
                     }
 
-                    Thread.sleep(100);         
+                    Thread.sleep(100);
                 }
 
             } catch (Exception exc) {
