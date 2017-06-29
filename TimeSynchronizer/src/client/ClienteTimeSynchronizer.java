@@ -73,6 +73,11 @@ public class ClienteTimeSynchronizer {
     public synchronized int getHora() {
         return ClienteTimeSynchronizer.horapublica;
     }
+    
+    public void sair(String nome){
+       ClienteTimeSynchronizer.listaNomes.remove(nome);
+//       System.out.println(ClienteTimeSynchronizer.listaNomes);
+    }
 
     public synchronized int getMin() {
         return ClienteTimeSynchronizer.minpublica;
@@ -100,6 +105,7 @@ public class ClienteTimeSynchronizer {
 
     public synchronized void setCoordenador(String novoCoordenador) {
         ClienteTimeSynchronizer.coordenador = novoCoordenador;
+        System.out.println(ClienteTimeSynchronizer.coordenador);
     }
     
     public synchronized ArrayList<String> getLista(){
@@ -153,6 +159,7 @@ public class ClienteTimeSynchronizer {
                         if (!listaNomes.contains(dadosRecebidos[1].trim())) {
                             listaNomes.add(dadosRecebidos[1].trim());
                         }
+//                        System.out.println(ClienteTimeSynchronizer.listaNomes);
                     } else if (msg.startsWith("1002")) {
 
                         String[] dadosRecebidos = msg.split(";");
@@ -170,6 +177,9 @@ public class ClienteTimeSynchronizer {
                             ClienteTimeSynchronizer.horapublica = hora;
                             ClienteTimeSynchronizer.minpublica = min;
                             ClienteTimeSynchronizer.segpublica = seg;
+                            ClienteTimeSynchronizer.horacoordenador = hora;
+                            ClienteTimeSynchronizer.mincoordenador = min;
+                            ClienteTimeSynchronizer.segcoordenador = seg;
                             ClienteTimeSynchronizer.atualizarHora = true;
                         }
                     }

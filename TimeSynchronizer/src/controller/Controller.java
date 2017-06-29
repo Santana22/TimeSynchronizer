@@ -107,4 +107,8 @@ public class Controller {
     public synchronized void setSegCoordenador(int novoSeg){
         this.cliente.setSegCoordenador(novoSeg);
     }
+    
+    public void sair (String nome){
+        this.cliente.sair(nome);
+    }
 }

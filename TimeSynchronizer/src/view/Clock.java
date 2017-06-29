@@ -22,23 +22,23 @@ public class Clock extends javax.swing.JFrame {
     private int hora;
     private int min;
     private int seg;
-  
+
     /**
      * Creates new form Clock
      */
     public Clock() {
         initComponents();
-        
+
         String[] inf = horaDefinida.split(":");
         this.hora = Integer.parseInt(inf[0]);
         this.min = Integer.parseInt(inf[1]);
         this.seg = Integer.parseInt(inf[2]);
-        
+
         controller.cadastrar(id);
         idvis.setText(id);
         clock.setText(horaDefinida);
         executarEleicao();
-        iniciarContagem();
+        sincronizar();
     }
 
     /**
@@ -55,8 +55,12 @@ public class Clock extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TimeSynchronizer");
-        setAutoRequestFocus(false);
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                sairDaLista(evt);
+            }
+        });
 
         clock.setFont(new java.awt.Font("Cantarell", 0, 48)); // NOI18N
         clock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -93,6 +97,11 @@ public class Clock extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void sairDaLista(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_sairDaLista
+        this.controller.sair(id);
+        System.exit(0);
+    }//GEN-LAST:event_sairDaLista
+
     /**
      * @param args the command line arguments
      */
@@ -128,12 +137,11 @@ public class Clock extends javax.swing.JFrame {
         });
     }
 
-    public void iniciarContagem() {
+    public void sincronizar() {
         new Thread() {
             @Override
             public void run() {
-                String[] inf = horaDefinida.split(":");
-                
+
                 String hr = "";
                 String min2 = "";
                 String seg2 = "";
@@ -142,14 +150,16 @@ public class Clock extends javax.swing.JFrame {
 
                 while (true) {
 
-                    controller.enviarHora(hora, min, seg);
-
-                    if (controller.getAtualizarHora()) {
-                        seg = controller.getSeg();
-                        min = controller.getMin();
-                        hora = controller.getHora();
-                        controller.setAtualizarHora(false);
-                    }
+                    if (controller.getCoordenador().equals(id)) {
+                        controller.enviarHora(hora, min, seg);
+                    } 
+                        if (controller.getAtualizarHora()) {
+                            seg = controller.getSeg();
+                            min = controller.getMin();
+                            hora = controller.getHora();
+                            controller.setAtualizarHora(false);
+                        }
+                    
 
                     hr = hora <= 9 ? "0" + hora : hora + "";
                     min2 = min <= 9 ? "0" + min : min + "";
@@ -193,7 +203,17 @@ public class Clock extends javax.swing.JFrame {
             controller.setMinCoordenador(this.min);
             controller.setSegCoordenador(this.seg);
         } else {
-
+            if ((hora > controller.getHoraCoordenador() && min > controller.getMinCoordernador() && seg > controller.getSegCoordenador())
+                    || (hora == controller.getHoraCoordenador() && min > controller.getMinCoordernador())
+                    || (hora == controller.getHoraCoordenador() && min == controller.getMinCoordernador() && seg > controller.getSegCoordenador())
+                    || (hora > controller.getHoraCoordenador() && min < controller.getMinCoordernador() && seg < controller.getSegCoordenador())
+                    || (hora > controller.getHoraCoordenador() && min < controller.getMinCoordernador() && seg > controller.getSegCoordenador())
+                    || hora > controller.getHoraCoordenador()) {
+                controller.setCoordenador(id);
+                controller.setHoraCoordenador(this.hora);
+                controller.setMinCoordenador(this.min);
+                controller.setSegCoordenador(this.seg);
+            }
         }
     }
 
