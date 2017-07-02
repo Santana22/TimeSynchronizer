@@ -28,6 +28,8 @@ public class ClienteTimeSynchronizer {
     private static int minpublica;
     private static int segpublica;
     private static boolean atualizarHora = false;
+    private static boolean executarEleicao = true;
+    private static String id = "";
     private static ArrayList<String> listaNomes = new ArrayList();
 
     public ClienteTimeSynchronizer() {
@@ -50,7 +52,6 @@ public class ClienteTimeSynchronizer {
     }
 
     public synchronized void enviarHora(int hora, int min, int seg) {
-
         byte dados[] = ("1002" + ";" + hora + ";" + min + ";" + seg).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
@@ -62,6 +63,24 @@ public class ClienteTimeSynchronizer {
     public synchronized void elegerCoordenador() {
     }
 
+    public synchronized void isAlive(String coordenador) {
+        byte dados[] = ("1004;" + coordenador).getBytes();
+        DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
+        try {
+            conexao.send(msgPacket);
+        } catch (IOException ex) {
+        }
+    }
+
+    public synchronized void entrar(String id) {
+        byte dados[] = ("1006;" + id).getBytes();
+        DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
+        try {
+            conexao.send(msgPacket);
+        } catch (IOException ex) {
+        }
+    }
+
     public synchronized boolean getAtualizarHora() {
         return ClienteTimeSynchronizer.atualizarHora;
     }
@@ -70,12 +89,20 @@ public class ClienteTimeSynchronizer {
         ClienteTimeSynchronizer.atualizarHora = valor;
     }
 
+    public void setID(String id) {
+        ClienteTimeSynchronizer.id = id;
+    }
+
+    public String getID() {
+        return ClienteTimeSynchronizer.id;
+    }
+
     public synchronized int getHora() {
         return ClienteTimeSynchronizer.horapublica;
     }
-    
-    public void sair(String nome){
-       ClienteTimeSynchronizer.listaNomes.remove(nome);
+
+    public void sair(String nome) {
+        ClienteTimeSynchronizer.listaNomes.remove(nome);
 //       System.out.println(ClienteTimeSynchronizer.listaNomes);
     }
 
@@ -107,35 +134,39 @@ public class ClienteTimeSynchronizer {
         ClienteTimeSynchronizer.coordenador = novoCoordenador;
         System.out.println(ClienteTimeSynchronizer.coordenador);
     }
-    
-    public synchronized ArrayList<String> getLista(){
+
+    public synchronized ArrayList<String> getLista() {
         return ClienteTimeSynchronizer.listaNomes;
     }
 
-    public synchronized int getHoraCoordenador(){
+    public synchronized int getHoraCoordenador() {
         return ClienteTimeSynchronizer.horacoordenador;
     }
-    
-    public synchronized int getMinCoordenador(){
+
+    public synchronized int getMinCoordenador() {
         return ClienteTimeSynchronizer.mincoordenador;
     }
-    
-    public synchronized int getSegCoordenador(){
+
+    public synchronized int getSegCoordenador() {
         return ClienteTimeSynchronizer.segcoordenador;
     }
-    
-    public synchronized void setHoraCoordenador(int novaHora){
+
+    public synchronized void setHoraCoordenador(int novaHora) {
         ClienteTimeSynchronizer.horacoordenador = novaHora;
     }
-    
-    public synchronized void setMinCoordenador(int novoMin){
+
+    public synchronized void setMinCoordenador(int novoMin) {
         ClienteTimeSynchronizer.horacoordenador = novoMin;
     }
-    
-    public synchronized void setSegCoordenador(int novoSeg){
+
+    public synchronized void setSegCoordenador(int novoSeg) {
         ClienteTimeSynchronizer.horacoordenador = novoSeg;
     }
-    
+
+    public synchronized boolean getExecutarEleicao() {
+        return ClienteTimeSynchronizer.executarEleicao;
+    }
+
     private class ThreadCliente extends Thread {
 
         private final MulticastSocket minhaConexaoMulticast;
@@ -181,6 +212,36 @@ public class ClienteTimeSynchronizer {
                             ClienteTimeSynchronizer.mincoordenador = min;
                             ClienteTimeSynchronizer.segcoordenador = seg;
                             ClienteTimeSynchronizer.atualizarHora = true;
+                        }
+                    } else if (msg.startsWith("1003")) {
+
+                    } else if (msg.startsWith("1004")) {
+                        String[] dadosRecebidos = msg.split(";");
+                        if (dadosRecebidos[1].equals(ClienteTimeSynchronizer.id)) {
+                            byte dados2[] = ("1005").getBytes();
+                            DatagramPacket msgPacket = new DatagramPacket(dados2, dados2.length, endereco, porta);
+                            try {
+                                conexao.send(msgPacket);
+                            } catch (IOException ex) {
+                            }
+                        }
+                    } else if (msg.startsWith("1005")) {
+                        ClienteTimeSynchronizer.executarEleicao = false;
+                    } else if (msg.startsWith("1006")) {
+                        String[] dadosRecebidos = msg.split(";");
+                        if (!dadosRecebidos[1].trim().equals(id)) {
+                            byte dados2[] = ("1007;" + id).getBytes();
+                            DatagramPacket msgPacket = new DatagramPacket(dados2, dados2.length, endereco, porta);
+
+                            try {
+                                conexao.send(msgPacket);
+                            } catch (IOException ex) {
+                            }
+                        }
+                    } else if (msg.startsWith("1007")) {
+                        String[] dadosRecebidos = msg.split(";");
+                        if (!listaNomes.contains(dadosRecebidos[1].trim())) {
+                            listaNomes.add(dadosRecebidos[1].trim());
                         }
                     }
 

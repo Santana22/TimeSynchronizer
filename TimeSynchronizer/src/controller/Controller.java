@@ -14,20 +14,16 @@ import java.util.ArrayList;
  */
 public class Controller {
 
-    private ClienteTimeSynchronizer cliente = new ClienteTimeSynchronizer();
-
-    private Controller() {
-    }
-
+    private static Controller INSTANCE = null;
+    private ClienteTimeSynchronizer cliente = new ClienteTimeSynchronizer();  
+    
     public static Controller getInstance() {
-        return ControllerHolder.INSTANCE;
+        if (INSTANCE == null) {
+            INSTANCE = new Controller();
+        }
+        return INSTANCE;
     }
-
-    private static class ControllerHolder {
-
-        private static final Controller INSTANCE = new Controller();
-    }
-
+    
     public void cadastrar(String nome) {
         this.cliente.cadastrar(nome);
     }
@@ -110,5 +106,25 @@ public class Controller {
     
     public void sair (String nome){
         this.cliente.sair(nome);
+    }
+    
+    public void setID(String id){
+        this.cliente.setID(id);
+    }
+    
+    public String getID(){
+        return this.cliente.getID();
+    }
+    
+    public boolean executarEleicao(){
+        return this.cliente.getExecutarEleicao();
+    }
+    
+    public void isAlive(String id){
+        this.cliente.isAlive(id);
+    }
+    
+    public void entrar(String id){
+        this.cliente.entrar(id);
     }
 }

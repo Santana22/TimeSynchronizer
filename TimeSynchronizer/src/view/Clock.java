@@ -35,8 +35,10 @@ public class Clock extends javax.swing.JFrame {
         this.seg = Integer.parseInt(inf[2]);
 
         controller.cadastrar(id);
+        controller.setID(id);
         idvis.setText(id);
         clock.setText(horaDefinida);
+        controller.entrar(id);
         executarEleicao();
         sincronizar();
     }
@@ -150,17 +152,21 @@ public class Clock extends javax.swing.JFrame {
 
                 while (true) {
 
+                    controller.isAlive(id);
+
+                    if (controller.executarEleicao()) {
+                        executarEleicao();
+                    }
+
                     if (controller.getCoordenador().equals(id)) {
                         controller.enviarHora(hora, min, seg);
-                    } 
-                        if (controller.getAtualizarHora()) {
-                            seg = controller.getSeg();
-                            min = controller.getMin();
-                            hora = controller.getHora();
-                            controller.setAtualizarHora(false);
-                        }
-                    
-
+                    }
+                    if (controller.getAtualizarHora()) {
+                        seg = controller.getSeg();
+                        min = controller.getMin();
+                        hora = controller.getHora();
+                        controller.setAtualizarHora(false);
+                    }
                     hr = hora <= 9 ? "0" + hora : hora + "";
                     min2 = min <= 9 ? "0" + min : min + "";
                     seg2 = seg <= 9 ? "0" + seg : seg + "";
@@ -197,19 +203,20 @@ public class Clock extends javax.swing.JFrame {
     }
 
     public void executarEleicao() {
+        System.out.println(controller.getLista().size());
         if (controller.getLista().size() == 1 || controller.getCoordenador().equals(this.id)) {
             controller.setCoordenador(id);
             controller.setHoraCoordenador(this.hora);
             controller.setMinCoordenador(this.min);
             controller.setSegCoordenador(this.seg);
         } else {
-            if ((hora > controller.getHoraCoordenador() && min > controller.getMinCoordernador() && seg > controller.getSegCoordenador())
-                    || (hora == controller.getHoraCoordenador() && min > controller.getMinCoordernador())
-                    || (hora == controller.getHoraCoordenador() && min == controller.getMinCoordernador() && seg > controller.getSegCoordenador())
-                    || (hora > controller.getHoraCoordenador() && min < controller.getMinCoordernador() && seg < controller.getSegCoordenador())
-                    || (hora > controller.getHoraCoordenador() && min < controller.getMinCoordernador() && seg > controller.getSegCoordenador())
-                    || hora > controller.getHoraCoordenador()) {
-                controller.setCoordenador(id);
+            if ((this.hora > controller.getHoraCoordenador() && this.min > controller.getMinCoordernador() && this.seg > controller.getSegCoordenador())
+                    || (this.hora == controller.getHoraCoordenador() && this.min > controller.getMinCoordernador())
+                    || (this.hora == controller.getHoraCoordenador() && this.min == controller.getMinCoordernador() && this.seg > controller.getSegCoordenador())
+                    || (this.hora > controller.getHoraCoordenador() && this.min < controller.getMinCoordernador() && this.seg < controller.getSegCoordenador())
+                    || (this.hora > controller.getHoraCoordenador() && this.min < controller.getMinCoordernador() && this.seg > controller.getSegCoordenador())
+                    || this.hora > controller.getHoraCoordenador()) {
+                controller.setCoordenador(this.id);
                 controller.setHoraCoordenador(this.hora);
                 controller.setMinCoordenador(this.min);
                 controller.setSegCoordenador(this.seg);
