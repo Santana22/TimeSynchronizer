@@ -13,7 +13,6 @@ import java.util.ArrayList;
  * @author vinicius
  */
 public class Controller {
-
     private static Controller INSTANCE = null;
     private ClienteTimeSynchronizer cliente = new ClienteTimeSynchronizer();  
     
@@ -23,17 +22,9 @@ public class Controller {
         }
         return INSTANCE;
     }
-    
-    public void cadastrar(String nome) {
-        this.cliente.cadastrar(nome);
-    }
 
     public void enviarHora(int hora, int min, int seg) {
         this.cliente.enviarHora(hora, min, seg);
-    }
-
-    public void elegerCoordenador() {
-        this.cliente.elegerCoordenador();
     }
 
     public boolean getAtualizarHora() {
@@ -76,38 +67,6 @@ public class Controller {
         this.cliente.setCoordenador(novoCoordenador);
     }
     
-    public synchronized ArrayList<String> getLista(){
-        return this.cliente.getLista();
-    }
-    
-     public synchronized int getHoraCoordenador() {
-        return cliente.getHoraCoordenador();
-    }
-
-    public synchronized int getMinCoordernador() {
-        return cliente.getMinCoordenador();
-    }
-
-    public synchronized int getSegCoordenador() {
-        return cliente.getSegCoordenador();
-    }
-    
-    public synchronized void setMinCoordenador(int novoMin){
-        this.cliente.setMinCoordenador(novoMin);
-    }
-    
-    public synchronized void setHoraCoordenador(int novaHora){
-        this.cliente.setHoraCoordenador(novaHora);
-    }
-    
-    public synchronized void setSegCoordenador(int novoSeg){
-        this.cliente.setSegCoordenador(novoSeg);
-    }
-    
-    public void sair (String nome){
-        this.cliente.sair(nome);
-    }
-    
     public void setID(String id){
         this.cliente.setID(id);
     }
@@ -120,11 +79,11 @@ public class Controller {
         return this.cliente.getExecutarEleicao();
     }
     
-    public void isAlive(String id){
-        this.cliente.isAlive(id);
+    public void verificarCoordenador(String id){
+        this.cliente.verificarCoordenador(id);
     }
     
-    public void entrar(String id){
-        this.cliente.entrar(id);
+    public void realizarEleicao(String id, int hora, int min, int seg){
+        this.cliente.realizarEleicao(id, hora, min, seg);
     }
 }

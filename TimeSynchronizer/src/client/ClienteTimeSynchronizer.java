@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.ArrayList;
 
 /**
  *
@@ -21,16 +20,13 @@ public class ClienteTimeSynchronizer {
     private InetAddress endereco;
     private MulticastSocket conexao;
     private static String coordenador = "";
-    private static int horacoordenador;
-    private static int mincoordenador;
-    private static int segcoordenador;
-    private static int horapublica;
-    private static int minpublica;
-    private static int segpublica;
+    private static String id = "";
+    private static int hora;
+    private static int min;
+    private static int seg;
     private static boolean atualizarHora = false;
     private static boolean executarEleicao = true;
-    private static String id = "";
-    private static ArrayList<String> listaNomes = new ArrayList();
+    private static boolean responderamEleicao = false;
 
     public ClienteTimeSynchronizer() {
         try {
@@ -42,8 +38,8 @@ public class ClienteTimeSynchronizer {
         }
     }
 
-    public synchronized void cadastrar(String nome) {
-        byte dados[] = ("1001" + ";" + nome).getBytes();
+    public void enviarHoraEleicao(String id, int hora, int min, int seg) {
+        byte dados[] = ("1001" + ";" + id + ";" + hora + ";" + min + ";" + seg).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
             conexao.send(msgPacket);
@@ -51,7 +47,7 @@ public class ClienteTimeSynchronizer {
         }
     }
 
-    public synchronized void enviarHora(int hora, int min, int seg) {
+    public void enviarHora(int hora, int min, int seg) {
         byte dados[] = ("1002" + ";" + hora + ";" + min + ";" + seg).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
@@ -60,11 +56,9 @@ public class ClienteTimeSynchronizer {
         }
     }
 
-    public synchronized void elegerCoordenador() {
-    }
-
-    public synchronized void isAlive(String coordenador) {
-        byte dados[] = ("1004;" + coordenador).getBytes();
+    public void realizarEleicao(String id, int hora, int min, int seg) {
+        ClienteTimeSynchronizer.responderamEleicao = false;
+        byte dados[] = ("1003" + ";" + id + ";" + hora + ";" + min + ";" + seg).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
             conexao.send(msgPacket);
@@ -72,8 +66,26 @@ public class ClienteTimeSynchronizer {
         }
     }
 
-    public synchronized void entrar(String id) {
-        byte dados[] = ("1006;" + id).getBytes();
+    public void responderEleicao(String id1, String id2) {
+        byte dados[] = ("1004;"+id1+";"+id2).getBytes();
+        DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
+        try {
+            conexao.send(msgPacket);
+        } catch (IOException ex) {
+        }
+    }
+
+    public void vencedorEleicao(String id) {
+        byte dados[] = ("1005" + ";" + id).getBytes();
+        DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
+        try {
+            conexao.send(msgPacket);
+        } catch (IOException ex) {
+        }
+    }
+
+    public synchronized void verificarCoordenador(String coordenador) {
+        byte dados[] = ("1006;" + coordenador).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
             conexao.send(msgPacket);
@@ -98,69 +110,38 @@ public class ClienteTimeSynchronizer {
     }
 
     public synchronized int getHora() {
-        return ClienteTimeSynchronizer.horapublica;
-    }
-
-    public void sair(String nome) {
-        ClienteTimeSynchronizer.listaNomes.remove(nome);
-//       System.out.println(ClienteTimeSynchronizer.listaNomes);
+        return ClienteTimeSynchronizer.hora;
     }
 
     public synchronized int getMin() {
-        return ClienteTimeSynchronizer.minpublica;
+        return ClienteTimeSynchronizer.min;
     }
 
     public synchronized int getSeg() {
-        return ClienteTimeSynchronizer.segpublica;
+        return ClienteTimeSynchronizer.seg;
     }
 
     public synchronized void setHora(int valor) {
-        ClienteTimeSynchronizer.horapublica = valor;
+        ClienteTimeSynchronizer.hora = valor;
     }
 
     public synchronized void setMin(int valor) {
-        ClienteTimeSynchronizer.minpublica = valor;
+        ClienteTimeSynchronizer.min = valor;
     }
 
     public synchronized void setSeg(int valor) {
-        ClienteTimeSynchronizer.segpublica = valor;
+        ClienteTimeSynchronizer.seg = valor;
     }
 
     public synchronized String getCoordenador() {
+        System.out.println(ClienteTimeSynchronizer.coordenador);
         return ClienteTimeSynchronizer.coordenador;
+        
     }
 
     public synchronized void setCoordenador(String novoCoordenador) {
         ClienteTimeSynchronizer.coordenador = novoCoordenador;
-        System.out.println(ClienteTimeSynchronizer.coordenador);
-    }
-
-    public synchronized ArrayList<String> getLista() {
-        return ClienteTimeSynchronizer.listaNomes;
-    }
-
-    public synchronized int getHoraCoordenador() {
-        return ClienteTimeSynchronizer.horacoordenador;
-    }
-
-    public synchronized int getMinCoordenador() {
-        return ClienteTimeSynchronizer.mincoordenador;
-    }
-
-    public synchronized int getSegCoordenador() {
-        return ClienteTimeSynchronizer.segcoordenador;
-    }
-
-    public synchronized void setHoraCoordenador(int novaHora) {
-        ClienteTimeSynchronizer.horacoordenador = novaHora;
-    }
-
-    public synchronized void setMinCoordenador(int novoMin) {
-        ClienteTimeSynchronizer.horacoordenador = novoMin;
-    }
-
-    public synchronized void setSegCoordenador(int novoSeg) {
-        ClienteTimeSynchronizer.horacoordenador = novoSeg;
+//        System.out.println(ClienteTimeSynchronizer.coordenador);
     }
 
     public synchronized boolean getExecutarEleicao() {
@@ -184,70 +165,60 @@ public class ClienteTimeSynchronizer {
                     String msg = new String(datagrama.getData());
 
                     if (msg.startsWith("1001")) {
-
                         String[] dadosRecebidos = msg.split(";");
 
-                        if (!listaNomes.contains(dadosRecebidos[1].trim())) {
-                            listaNomes.add(dadosRecebidos[1].trim());
-                        }
-//                        System.out.println(ClienteTimeSynchronizer.listaNomes);
                     } else if (msg.startsWith("1002")) {
-
                         String[] dadosRecebidos = msg.split(";");
 
-                        int hora = Integer.parseInt(dadosRecebidos[1].trim());
-                        int min = Integer.parseInt(dadosRecebidos[2].trim());
-                        int seg = Integer.parseInt(dadosRecebidos[3].trim());
+                        ClienteTimeSynchronizer.hora = Integer.parseInt(dadosRecebidos[1].trim());
+                        ClienteTimeSynchronizer.min = Integer.parseInt(dadosRecebidos[2].trim());
+                        ClienteTimeSynchronizer.seg = Integer.parseInt(dadosRecebidos[3].trim());
 
-                        if ((hora > ClienteTimeSynchronizer.horapublica && min > ClienteTimeSynchronizer.minpublica && seg > ClienteTimeSynchronizer.segpublica)
-                                || (hora == ClienteTimeSynchronizer.horapublica && min > ClienteTimeSynchronizer.minpublica)
-                                || (hora == ClienteTimeSynchronizer.horapublica && min == ClienteTimeSynchronizer.minpublica && seg > ClienteTimeSynchronizer.segpublica)
-                                || (hora > ClienteTimeSynchronizer.horapublica && min < ClienteTimeSynchronizer.minpublica && seg < ClienteTimeSynchronizer.segpublica)
-                                || (hora > ClienteTimeSynchronizer.horapublica && min < ClienteTimeSynchronizer.minpublica && seg > ClienteTimeSynchronizer.segpublica)
-                                || hora > ClienteTimeSynchronizer.horapublica) {
-                            ClienteTimeSynchronizer.horapublica = hora;
-                            ClienteTimeSynchronizer.minpublica = min;
-                            ClienteTimeSynchronizer.segpublica = seg;
-                            ClienteTimeSynchronizer.horacoordenador = hora;
-                            ClienteTimeSynchronizer.mincoordenador = min;
-                            ClienteTimeSynchronizer.segcoordenador = seg;
-                            ClienteTimeSynchronizer.atualizarHora = true;
-                        }
                     } else if (msg.startsWith("1003")) {
+                        String[] dadosRecebidos = msg.split(";");
+                        int resulthora = Integer.parseInt(dadosRecebidos[2].trim()) - ClienteTimeSynchronizer.hora;
+                        int resultmin = Integer.parseInt(dadosRecebidos[3].trim()) - ClienteTimeSynchronizer.min;
+                        int resultseg = Integer.parseInt(dadosRecebidos[4].trim()) - ClienteTimeSynchronizer.seg;
+
+                        if (dadosRecebidos[1].trim().equals(id)) {
+                            if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
+                                responderEleicao(dadosRecebidos[1].trim(), id);
+                                realizarEleicao(id, hora, min, seg);
+                            }
+                            responderEleicao(dadosRecebidos[1].trim(), id);
+                        } 
 
                     } else if (msg.startsWith("1004")) {
                         String[] dadosRecebidos = msg.split(";");
-                        if (dadosRecebidos[1].equals(ClienteTimeSynchronizer.id)) {
-                            byte dados2[] = ("1005").getBytes();
-                            DatagramPacket msgPacket = new DatagramPacket(dados2, dados2.length, endereco, porta);
-                            try {
-                                conexao.send(msgPacket);
-                            } catch (IOException ex) {
-                            }
+                        
+                        if(dadosRecebidos[1].trim().equals(dadosRecebidos[2].trim()) && ClienteTimeSynchronizer.responderamEleicao == false){
+                            vencedorEleicao(id);
+                        }else if(dadosRecebidos[1].trim().equals(id)){
+                            ClienteTimeSynchronizer.responderamEleicao = true;
                         }
+                        
+   
                     } else if (msg.startsWith("1005")) {
-                        ClienteTimeSynchronizer.executarEleicao = false;
+                        String[] dadosRecebidos = msg.split(";");
+                        ClienteTimeSynchronizer.coordenador = dadosRecebidos[1].trim();
+
                     } else if (msg.startsWith("1006")) {
                         String[] dadosRecebidos = msg.split(";");
-                        if (!dadosRecebidos[1].trim().equals(id)) {
-                            byte dados2[] = ("1007;" + id).getBytes();
-                            DatagramPacket msgPacket = new DatagramPacket(dados2, dados2.length, endereco, porta);
 
+                        if (dadosRecebidos[1].trim().equals(id)) {
+                            byte dados2[] = ("1007").getBytes();
+                            DatagramPacket msgPacket = new DatagramPacket(dados2, dados2.length, endereco, porta);
                             try {
                                 conexao.send(msgPacket);
                             } catch (IOException ex) {
                             }
                         }
                     } else if (msg.startsWith("1007")) {
-                        String[] dadosRecebidos = msg.split(";");
-                        if (!listaNomes.contains(dadosRecebidos[1].trim())) {
-                            listaNomes.add(dadosRecebidos[1].trim());
-                        }
+                        ClienteTimeSynchronizer.executarEleicao = false;
                     }
 
                     Thread.sleep(100);
                 }
-
             } catch (Exception exc) {
 
             }

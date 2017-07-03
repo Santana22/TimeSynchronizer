@@ -6,6 +6,8 @@
 package view;
 
 import controller.Controller;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,9 +18,9 @@ public class Clock extends javax.swing.JFrame {
 
     private final Controller controller = Controller.getInstance();
 
-    private String id = JOptionPane.showInputDialog(null, "Nome da Máquina");
-    private String horaDefinida = JOptionPane.showInputDialog(null, "Digite a hora");
-    private String drift = JOptionPane.showInputDialog(null, "Digite o drift desejado");
+    private final String id = JOptionPane.showInputDialog(null, "Nome da Máquina");
+    private final String horaDefinida = JOptionPane.showInputDialog(null, "Digite a hora");
+    private final String drift = JOptionPane.showInputDialog(null, "Digite o drift desejado");
     private int hora;
     private int min;
     private int seg;
@@ -28,18 +30,8 @@ public class Clock extends javax.swing.JFrame {
      */
     public Clock() {
         initComponents();
-
-        String[] inf = horaDefinida.split(":");
-        this.hora = Integer.parseInt(inf[0]);
-        this.min = Integer.parseInt(inf[1]);
-        this.seg = Integer.parseInt(inf[2]);
-
-        controller.cadastrar(id);
-        controller.setID(id);
-        idvis.setText(id);
-        clock.setText(horaDefinida);
-        controller.entrar(id);
-        executarEleicao();
+        inicializarValores();
+        contar();
         sincronizar();
     }
 
@@ -100,7 +92,7 @@ public class Clock extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void sairDaLista(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_sairDaLista
-        this.controller.sair(id);
+//        this.controller.sair(id);
         System.exit(0);
     }//GEN-LAST:event_sairDaLista
 
@@ -139,7 +131,7 @@ public class Clock extends javax.swing.JFrame {
         });
     }
 
-    public void sincronizar() {
+    public void contar() {
         new Thread() {
             @Override
             public void run() {
@@ -151,34 +143,15 @@ public class Clock extends javax.swing.JFrame {
                 double minhaContagem = Double.parseDouble(drift);
 
                 while (true) {
-
-                    controller.isAlive(id);
-
-                    if (controller.executarEleicao()) {
-                        executarEleicao();
-                    }
-
-                    if (controller.getCoordenador().equals(id)) {
-                        controller.enviarHora(hora, min, seg);
-                    }
-                    if (controller.getAtualizarHora()) {
-                        seg = controller.getSeg();
-                        min = controller.getMin();
-                        hora = controller.getHora();
-                        controller.setAtualizarHora(false);
-                    }
-                    hr = hora <= 9 ? "0" + hora : hora + "";
-                    min2 = min <= 9 ? "0" + min : min + "";
-                    seg2 = seg <= 9 ? "0" + seg : seg + "";
-                    setLabel(hr + ":" + min2 + ":" + seg2);
-
                     try {
                         long novo = (long) (1000 * minhaContagem);
                         Thread.sleep(novo);
                         seg = seg + 1;
+
                         if (seg > 59) {
                             seg = 0;
                             min = min + 1;
+
                             if (min > 59) {
                                 min = 0;
                                 hora = hora + 1;
@@ -193,6 +166,7 @@ public class Clock extends javax.swing.JFrame {
                         seg2 = seg <= 9 ? "0" + seg : seg + "";
 
                         setLabel(hr + ":" + min2 + ":" + seg2);
+
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
@@ -201,31 +175,55 @@ public class Clock extends javax.swing.JFrame {
             }
         }.start();
     }
+    
+    public void sincronizar() {
+        new Thread() {
+            @Override
+            public void run() {
 
-    public void executarEleicao() {
-        System.out.println(controller.getLista().size());
-        if (controller.getLista().size() == 1 || controller.getCoordenador().equals(this.id)) {
-            controller.setCoordenador(id);
-            controller.setHoraCoordenador(this.hora);
-            controller.setMinCoordenador(this.min);
-            controller.setSegCoordenador(this.seg);
-        } else {
-            if ((this.hora > controller.getHoraCoordenador() && this.min > controller.getMinCoordernador() && this.seg > controller.getSegCoordenador())
-                    || (this.hora == controller.getHoraCoordenador() && this.min > controller.getMinCoordernador())
-                    || (this.hora == controller.getHoraCoordenador() && this.min == controller.getMinCoordernador() && this.seg > controller.getSegCoordenador())
-                    || (this.hora > controller.getHoraCoordenador() && this.min < controller.getMinCoordernador() && this.seg < controller.getSegCoordenador())
-                    || (this.hora > controller.getHoraCoordenador() && this.min < controller.getMinCoordernador() && this.seg > controller.getSegCoordenador())
-                    || this.hora > controller.getHoraCoordenador()) {
-                controller.setCoordenador(this.id);
-                controller.setHoraCoordenador(this.hora);
-                controller.setMinCoordenador(this.min);
-                controller.setSegCoordenador(this.seg);
+                String hr = "";
+                String min2 = "";
+                String seg2 = "";
+
+                while (true) {
+                    try {
+                        Thread.sleep(5000);
+
+                        if (controller.getCoordenador().equals(id)) {
+                            controller.enviarHora(hora, min, seg);
+                        } else{
+//                            controller.realizarEleicao(id, hora, min, seg);
+                            hora = controller.getHora();
+                            min = controller.getMin();
+                            seg = controller.getSeg();
+                        }
+                        
+
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Clock.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                }
+
             }
-        }
+
+        }.start();
     }
 
     private void setLabel(String texto) {
         clock.setText(texto);
+    }
+
+    private void inicializarValores() {
+        String[] inf = horaDefinida.split(":");
+        this.hora = Integer.parseInt(inf[0]);
+        this.min = Integer.parseInt(inf[1]);
+        this.seg = Integer.parseInt(inf[2]);
+
+        idvis.setText(id);
+        clock.setText(horaDefinida);
+        controller.setID(id);
+//        controller.entrar(id);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
