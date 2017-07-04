@@ -6,7 +6,6 @@
 package controller;
 
 import client.ClienteTimeSynchronizer;
-import java.util.ArrayList;
 
 /**
  *

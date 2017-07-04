@@ -57,7 +57,8 @@ public class ClienteTimeSynchronizer {
     }
 
     public void realizarEleicao(String id, int hora, int min, int seg) {
-        ClienteTimeSynchronizer.responderamEleicao = false;
+        //ClienteTimeSynchronizer.responderamEleicao = false;
+        System.out.println("Pedido de Eleição de " + id);
         byte dados[] = ("1003" + ";" + id + ";" + hora + ";" + min + ";" + seg).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
@@ -67,7 +68,8 @@ public class ClienteTimeSynchronizer {
     }
 
     public void responderEleicao(String id1, String id2) {
-        byte dados[] = ("1004;"+id1+";"+id2).getBytes();
+        System.out.println(id2 + " respondeu " + id1);
+        byte dados[] = ("1004" + ";" + id1 + ";" + id2).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
             conexao.send(msgPacket);
@@ -76,6 +78,7 @@ public class ClienteTimeSynchronizer {
     }
 
     public void vencedorEleicao(String id) {
+        System.out.println(id + " é o novo Coordenador");
         byte dados[] = ("1005" + ";" + id).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
@@ -134,9 +137,9 @@ public class ClienteTimeSynchronizer {
     }
 
     public synchronized String getCoordenador() {
-        System.out.println(ClienteTimeSynchronizer.coordenador);
+        //System.out.println("O Coordenador é: " + ClienteTimeSynchronizer.coordenador);
         return ClienteTimeSynchronizer.coordenador;
-        
+
     }
 
     public synchronized void setCoordenador(String novoCoordenador) {
@@ -169,6 +172,8 @@ public class ClienteTimeSynchronizer {
 
                     } else if (msg.startsWith("1002")) {
                         String[] dadosRecebidos = msg.split(";");
+                        
+                        System.out.println("Atualização pelo Coordenador " + ClienteTimeSynchronizer.coordenador); 
 
                         ClienteTimeSynchronizer.hora = Integer.parseInt(dadosRecebidos[1].trim());
                         ClienteTimeSynchronizer.min = Integer.parseInt(dadosRecebidos[2].trim());
@@ -180,24 +185,24 @@ public class ClienteTimeSynchronizer {
                         int resultmin = Integer.parseInt(dadosRecebidos[3].trim()) - ClienteTimeSynchronizer.min;
                         int resultseg = Integer.parseInt(dadosRecebidos[4].trim()) - ClienteTimeSynchronizer.seg;
 
-                        if (dadosRecebidos[1].trim().equals(id)) {
-                            if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
+                        if (!dadosRecebidos[1].trim().equals(id)) {
+                            if (resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)) {
                                 responderEleicao(dadosRecebidos[1].trim(), id);
                                 realizarEleicao(id, hora, min, seg);
                             }
+                        } else {
                             responderEleicao(dadosRecebidos[1].trim(), id);
-                        } 
+                        }
 
                     } else if (msg.startsWith("1004")) {
                         String[] dadosRecebidos = msg.split(";");
-                        
-                        if(dadosRecebidos[1].trim().equals(dadosRecebidos[2].trim()) && ClienteTimeSynchronizer.responderamEleicao == false){
+
+                        if (dadosRecebidos[1].trim().equals(dadosRecebidos[2].trim()) && ClienteTimeSynchronizer.responderamEleicao == false) {
                             vencedorEleicao(id);
-                        }else if(dadosRecebidos[1].trim().equals(id)){
+                        } else if (dadosRecebidos[1].trim().equals(id)) {
                             ClienteTimeSynchronizer.responderamEleicao = true;
                         }
-                        
-   
+
                     } else if (msg.startsWith("1005")) {
                         String[] dadosRecebidos = msg.split(";");
                         ClienteTimeSynchronizer.coordenador = dadosRecebidos[1].trim();

@@ -5,6 +5,7 @@
  */
 package view;
 
+import client.ClienteTimeSynchronizer;
 import controller.Controller;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,11 +148,9 @@ public class Clock extends javax.swing.JFrame {
                         long novo = (long) (1000 * minhaContagem);
                         Thread.sleep(novo);
                         seg = seg + 1;
-
                         if (seg > 59) {
                             seg = 0;
                             min = min + 1;
-
                             if (min > 59) {
                                 min = 0;
                                 hora = hora + 1;
@@ -187,18 +186,22 @@ public class Clock extends javax.swing.JFrame {
 
                 while (true) {
                     try {
-                        Thread.sleep(5000);
-
+                        Thread.sleep(1000);
                         if (controller.getCoordenador().equals(id)) {
                             controller.enviarHora(hora, min, seg);
                         } else{
-//                            controller.realizarEleicao(id, hora, min, seg);
-                            hora = controller.getHora();
-                            min = controller.getMin();
-                            seg = controller.getSeg();
+                            int resulthora = controller.getHora() - hora;
+                            int resultmin = controller.getMin() - min;
+                            int resultseg = controller.getSeg() - seg;
+                            
+                            if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
+                                controller.realizarEleicao(id, hora, min, seg);
+                            } else{
+                                hora = controller.getHora();
+                                min = controller.getMin();
+                                seg = controller.getSeg();
+                            }
                         }
-                        
-
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Clock.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -223,8 +226,26 @@ public class Clock extends javax.swing.JFrame {
         idvis.setText(id);
         clock.setText(horaDefinida);
         controller.setID(id);
-//        controller.entrar(id);
-    }
+        
+        if(controller.getCoordenador().equals("")){
+                controller.realizarEleicao(id, hora, min, seg);
+        }
+        
+//        int resulthora = controller.getHora() - hora;
+//        int resultmin = controller.getMin() - min;
+//        int resultseg = controller.getSeg() - seg;
+//
+//        if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
+//            controller.realizarEleicao(id, hora, min, seg);
+//        } else{
+//            hora = controller.getHora();
+//            min = controller.getMin();
+//            seg = controller.getSeg();
+//            
+//            
+//        }
+}
+        
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel clock;
