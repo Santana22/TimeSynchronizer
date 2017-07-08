@@ -44,13 +44,22 @@
 
 \section{Introdução}
 
-Na modernidade, tempo tornou-se um elemento precioso. Não obstante, sua noção é bastante difusa e, por diversas vezes, já foi tema de discussões filosóficas e alvo de pesquisas na Física. O que se sabe é que ele norteia a vida das sociedades e constitui-se como moeda de troca nas relações de trabalho.
+Na modernidade, tempo tornou-se um elemento precioso. Não obstante, sua noção é bastante difusa e, por diversas vezes, é tema de discussões filosóficas e alvo de pesquisas na Física. O que se sabe é que ele norteia a vida das sociedades e constitui-se como moeda de troca nas relações de trabalho.
 
-Nos sistemas computacionais não é diferente. Ter uma referência para a execução das tarefas é importante. Essas tarefas podem ser as mais variadas: desde a criação de um arquivo até a execução de uma tarefa previamente determinada, por exemplo. Entretanto, dispositivos diferentes podem mensurar instantes de maneira diferente e, com o passar do tempo, naturalmente atrasar ou adiantar. 
+Nos sistemas computacionais não é diferente. Ter uma referência para a execução das tarefas é importante. Essas tarefas podem ser das mais variadas: desde a criação de um arquivo até a execução de um \textit{back-up} agendado, por exemplo. Entretanto, por um aspecto construtivo, dispositivos diferentes (ou até mesmo iguais) podem mensurar os instantes de maneira diferente e, com o passar do tempo, naturalmente atrasar ou adiantar. Assim, é preciso buscar maneiras confiáveis de manter a sincronização dos relógios. 
 
-\section{Desenvolvimento}
-\subsection{Sistemas Distribuídos}
-Coulouris define um sistema distribuído no qual componentes de hardware ou software, localizados em computadores de uma rede, coordenam suas ações e se comunicam por meio da troca de mensagens.
+\section{Desenvolvimento} \label{desen}
+\subsection{Sistemas Distribuídos}\label{sistdis}
+
+A utilização dos computadores é vital para o funcionamento e realização de diversas atividades. Deste modo, diversas arquiteturas  
+
+Coulouris define um sistema distribuído cujos componentes localizam-se em uma rede de computadores e coordenam suas ações por meio da troca de mensagens. Por exemplo, inclui-se os jogos \textit{multiplayer} online e os sistemas de buscas web. Esta definição consegue caracterizar bem a maioria dos sistemas existentes e faz menção às características de concorrência no uso dos componentes, tolerância às falhas e ausência de um relógio comum. 
+
+A concorrência no uso dos componentes é uma realidade quase que inevitável em uma rede de computadores. Se um grupo de estudantes, nas suas residências, compartilham arquivos e escrevem o trabalho simultaneamente, é importante que o sistema tenha a capacidade de coordenar as ações da melhor forma.  %\textquotedblleft \textquotedblright
+
+Falhas podem acontecer a qualquer instante e é importante que seja dimensionado três itens: identificação das falhas, ações de emergência e os impactos. Assim, por exemplo, mensagens podem não ser recebidas ou atrasarem e os processos podem finalizar de maneira inesperada (\textit{crash}). Em qualquer situação, o sistema deve continuar funcionando corretamente.
+
+
 
 \subsection{Sincronização em Sistemas Distribuídos}
 
