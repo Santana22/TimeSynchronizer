@@ -1,19 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
-import client.ClienteTimeSynchronizer;
 import controller.Controller;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- *
- * @author vinicius
+ * Interface para a exibiçao do relógio.
+ * @author Santana
  */
 public class Clock extends javax.swing.JFrame {
 
@@ -132,6 +126,10 @@ public class Clock extends javax.swing.JFrame {
         });
     }
 
+    /**
+     * Thread que a realiza a contagem do cronômetro.
+     */
+    
     public void contar() {
         new Thread() {
             @Override
@@ -175,6 +173,10 @@ public class Clock extends javax.swing.JFrame {
         }.start();
     }
     
+    /**
+     * Thread que realiza a sincornização com os outros relógios.
+     */
+    
     public void sincronizar() {
         new Thread() {
             @Override
@@ -186,22 +188,28 @@ public class Clock extends javax.swing.JFrame {
 
                 while (true) {
                     try {
-                        Thread.sleep(1000);
-                        if (controller.getCoordenador().equals(id)) {
+                        Thread.sleep(5*1000);
+                        int horatemp = controller.getHora();
+                        int mintemp = controller.getMin();
+                        int segtemp = controller.getSeg();
+                        int resulthora = horatemp - hora;
+                        int resultmin = mintemp - min;
+                        int resultseg = segtemp - seg;
+
+                        if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
                             controller.enviarHora(hora, min, seg);
-                        } else{
-                            int resulthora = controller.getHora() - hora;
-                            int resultmin = controller.getMin() - min;
-                            int resultseg = controller.getSeg() - seg;
-                            
-                            if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
-                                controller.realizarEleicao(id, hora, min, seg);
-                            } else{
-                                hora = controller.getHora();
-                                min = controller.getMin();
-                                seg = controller.getSeg();
-                            }
+                            controller.vencedorEeicao(id);
+                        } else {
+                            hora = horatemp;
+                            min = mintemp;
+                            seg = segtemp;
                         }
+                        
+//                        if (controller.getCoordenador().equals(id)) {
+//                            
+//                        } else{
+//                            
+//                        }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Clock.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -227,9 +235,9 @@ public class Clock extends javax.swing.JFrame {
         clock.setText(horaDefinida);
         controller.setID(id);
         
-        if(controller.getCoordenador().equals("")){
-                controller.realizarEleicao(id, hora, min, seg);
-        }
+//        if(controller.getCoordenador().equals("")){
+//                controller.realizarEleicao(id, hora, min, seg);
+//        }
         
 //        int resulthora = controller.getHora() - hora;
 //        int resultmin = controller.getMin() - min;
@@ -245,7 +253,6 @@ public class Clock extends javax.swing.JFrame {
 //            
 //        }
 }
-        
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel clock;
