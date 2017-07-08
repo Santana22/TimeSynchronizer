@@ -1,8 +1,19 @@
 \begin{thebibliography}{}
 
+\bibitem[author ]{id}
+author.
+\newblock {\em title}, volume volume of {\em series}.
+\newblock publisher, edition edition.
+\newblock note.
+
 \bibitem[Caelum 2017]{caelum2017}
 Caelum (2017).
 \newblock Java e {O}rientação a {O}bjetos - {C}urso {FJ} - 11.
 \newblock www.caelum.com.br/apostilas.
+
+\bibitem[Kurose and Ross 2010]{kurose2010}
+Kurose, F. and Ross, K. (2010).
+\newblock {\em Redes de computadores e a {I}nternet: uma abordagem top-down}.
+\newblock Pearson.
 
 \end{thebibliography}
