@@ -56,7 +56,7 @@ Desse modo, o presente documento apresenta os conhecimentos necessários para a c
 
 Diante da demanda estabelecida, é imediato iniciar o desenvolvimento do sistema com a definição da arquitetura. Se para que a sincronização dos relógios aconteça, os dispositivos devem conectar-se entre si. Desse modo, o modelo Cliente/Cliente deverá ser utilizado.
 
-O modelo Cliente/Cliente é amplamente utilizado em arquiteturas distribuídas ou descentralizadas. Isto não significa que não exista um servidor, significa que a posse desta função é dinâmica, ao contrário do modelo Cliente/Servidor que é estática. Assim, a depender das configurações, estado e objetivos, por exemplo, há troca de servidores \cite{kurose2010}. 
+O modelo Cliente/Cliente é amplamente utilizado em arquiteturas distribuídas ou descentralizadas. Isto não significa que não exista um servidor, significa que a posse desta função é dinâmica, ao contrário do modelo Cliente/Servidor que é estática. Assim, a depender das configurações, estado e objetivos, por exemplo, há troca de servidores. Receba também a denominação Peer-to-Peer (P2P) \cite{kurose2010}. 
 
 Outro ponto importante no projeto é a escolha da linguagem de programação. Para o desenvolvimento deste sistema foi escolhida a linguagem Java. A codificação em Java permite um ganho ímpar em portabilidade. Desse modo, independente da plataforma de Sistema Operacional (\textit{Windows}, \textit{Linux} ou \textit{MacOS}), a aplicação funcionará, exigindo apenas a instalação da máquina virtual fornecida pelo Java. Em outras palavras, isso significa praticidade e redução nos custos do projeto \cite{caelum2017}. 
 
@@ -76,6 +76,18 @@ A ausência de um relógio comum tem início em dois problemas. O primeiro, como ab
 
 \subsection{Sincronização Temporal em Sistemas Distribuídos}
 
+O grande trunfo da sincronização temporal, nos sistemas distribuídos, é fazer com que os componentes concordem com uma determinada hora, não necessariamente a hora tida como correta. Não obstante, para haver consistência temporal, é importante que a política seja mantida. 
+
+Neste plano, o algoritmo contido no \textit{Berkley Software Distribuition} (BSD) é uma solução elegante. Quando uma sincronização é necessária, um coordenador (escolhido previamente e que atende ao conceito de servidor dinâmico) solicita que os dispositivos enviem suas estampas de tempo. Ao receber, o mesmo avalia cada estampa com a própria e responde com o ajuste que cada dispositivo deve fazer para manter-se sincronizado. Assim, a concordância temporal é alcançada \cite{coulouris2012}. Entretanto, esta solução permite que tempo possa avançar ou retroceder, pois o ajuste mantém relação de dependência com quem ocupa o cargo de coordenador. Em aplicações críticas, tal comportamento temporal é indesejado.
+
+Com o objetivo de adaptar o algoritmo para o desenvolvimento do sistema proposto, duas modificações foram feitas: 
+
+\begin{itemize}
+	\item[1º] A escolha do coordenador é baseada em critérios que garantem a monotonicidade temporal.
+	\item[2º] O coordenador envia sua estampa de tempo, em períodos fixos, para que todos os dispositivos mantenham-se sincronizados.
+\end{itemize}
+
+Desse modo, seguiu-se o critério de avaliar qual dispositivo possuía a maior estampa de tempo naquele momento 
 
 \subsection{Implementação Cliente/Cliente}
 
@@ -92,7 +104,7 @@ Para o desenvolvimento
 	
 \bibitem[Kurose e Ross 2010]{kurose2010} F. Kurose e K. Ross (2010). Redes de computadores e a {I}nternet: uma abordagem top-down. 5 ed. São Paulo: Pearson.
 
-\bibitem{coulouris2012} G. Coulouris, J. Dollimore, T. Kindberg e G. Blair (2012). Distributed {S}ystems:
+\bibitem[Coulouris \textit{et. al.} 2012]{coulouris2012} G. Coulouris, J. Dollimore, T. Kindberg e G. Blair (2012). Distributed {S}ystems:
 {C}oncepts and {D}esign. 5 ed. Boston: Pearson.
 
 \end{thebibliography}

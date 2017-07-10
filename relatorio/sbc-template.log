@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350) (preloaded format=pdflatex 2017.6.17)  8 JUL 2017 20:25
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350) (preloaded format=pdflatex 2017.6.17)  10 JUL 2017 09:39
 entering extended mode
 **./sbc-template.tex
 (sbc-template.tex
@@ -288,36 +288,42 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <13> not available
  [1
 
 {C:/Users/Santana/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-LaTeX Font Info:    Try loading font information for OML+ptm on input line 93.
+Underfull \hbox (badness 1478) in paragraph at lines 67--68
+\OT1/ptm/m/n/12 Para [[]], um sis-tema dis-tribu[]do []e aquele cu-jos com-po-
+nen-tes
+ []
 
-("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\omlptm.fd"
+[2]
+LaTeX Font Info:    Try loading font information for OML+ptm on input line 103.
+
+ ("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\omlptm.fd"
 File: omlptm.fd 
 )
 LaTeX Font Info:    Font shape `OML/ptm/m/n' in size <12> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 93.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 103.
 
-Underfull \hbox (badness 1014) in paragraph at lines 93--94
+Underfull \hbox (badness 1014) in paragraph at lines 103--104
 []\OT1/ptm/m/n/12 Caelum (2017).  Java e Orienta[][]ao a Ob-je-tos - Curso FJ -
  11. Dis-pon[]vel em:
  []
 
-[2] [3] (sbc-template.aux) ) 
+[3] (sbc-template.aux) ) 
 Here is how much of TeX's memory you used:
- 3239 strings out of 493323
- 45513 string characters out of 3139060
- 123408 words of memory out of 3000000
- 6715 multiletter control sequences out of 15000+200000
- 18188 words of font info for 40 fonts, out of 3000000 for 9000
+ 3242 strings out of 493323
+ 45552 string characters out of 3139060
+ 124432 words of memory out of 3000000
+ 6717 multiletter control sequences out of 15000+200000
+ 19773 words of font info for 42 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 39i,10n,28p,735b,312s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8
-r.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C
-:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program 
-Files/MiKTeX 2.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/Program Files/MiKTeX 2.
-9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw
-/times/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pf
-b><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on sbc-template.pdf (3 pages, 83277 bytes).
+ 39i,10n,28p,750b,312s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8r.en
+c}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program File
+s/MiKTeX 2.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/Program Files/MiKTeX 2.9/fo
+nts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/tim
+es/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C
+:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on sbc-template.pdf (3 pages, 85837 bytes).
 PDF statistics:
  41 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
