@@ -143,4 +143,8 @@ public class Controller {
     public void vencedorEeicao(String id){
         this.cliente.vencedorEleicao(id);
     }
+    
+    public long getMaxRTT(){
+        return this.cliente.getMaxRTT();
+    }
 }

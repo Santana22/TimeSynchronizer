@@ -31,16 +31,7 @@
 \end{resumo}
 
 
-%\begin{figure}[h]
-%	
-%	\center
-%	\subfigure[tela\_inicial][Tela Inicial.]{\includegraphics[scale = 0.45]{tela_inicial.eps}}
-%	\qquad
-%	\subfigure[home\_page][Home-Page com as operações disponíveis.]{\includegraphics[scale = 0.45]{home_cliente.eps}}
-%	\caption{Imagens do sistema desenvolvido.}
-%	\label{sistemaimgs}
-%	
-%\end{figure}
+
 
 \section{Introdução}
 
@@ -89,7 +80,7 @@ Com o objetivo de adaptar o algoritmo para o desenvolvimento do sistema proposto
 
 \subsection{Algoritmo de Eleição}
 
-As partes integrantes de um sistema distribuído necessitam manter certo nível de organização, não sendo diferente no desenvolvimento desta solução. Um modo de manter a organização é a existência de hierarquia. Desse modo, é preciso determinar, mesmo que por um instante ou não, quem será responsável por enviar as estampas e quem as receberá. Na literatura, esta coordenação é provida por um algoritmo de eleição.
+As partes integrantes de um sistema distribuído necessitam manter certo nível de organização. Um modo de manter a organização é a existência de hierarquia. Desse modo, é preciso determinar, mesmo que por um instante ou não, quem será responsável por enviar as estampas e quem as receberá. Na literatura, esta coordenação é provida por um algoritmo de eleição.%não sendo diferente no desenvolvimento desta solução. 
 
 O objetivo mais simples desta classe é permitir que alguém possa conduzir a realização de uma determinada tarefa. Não obstante, é fornecido também uma modo para identificar possíveis falhas e providências. Aqui, falha é compreendida como a não resposta do coordenador corrente ou estampa de tempo enviada sem assegurar a monotonicidade do tempo. Na arquitetura proposta, foi escolhido a utilização do Algoritmo de \textit{Bully} (tradução livre, Valentão), com modificações \cite{coulouris2012}.
 
@@ -115,14 +106,14 @@ Na implementação corrente, quando $P$ identifica a ocorrência de falha, este ass
 
 \subsection{Implementação Cliente/Cliente}
 
-Para realizar a comunicação entre os dispositivos, com o auxílio do Java, foi definido um grupo de \textit{multicast}. Este compreende os interessados em enviar e receber mensagens. Além disto, \textit{Threads} e o protocolo de transporte UDP foram utilizados também. No aspecto comunicativo, é importante que os dispositivos possam se comunicar de maneira eficiente e padronizada. Desse modo, é importante definir um protocolo de comunicação. As informações estão na Tabela 1.
+Para realizar a comunicação entre os dispositivos, com o auxílio do Java, foi definido um grupo de \textit{multicast}. Este é capaz de reunir os interessados em enviar e receber determinadas mensagens. Além disto, \textit{Threads} e o protocolo de transporte UDP foram utilizados também. No aspecto comunicativo, é importante que os dispositivos possam se comunicar de maneira eficiente e padronizada. Desse modo, é importante definir um protocolo de comunicação. As informações estão na Tabela 1.
 
 \begin{center}
 	\textbf{Tabela 1. Protocolo de comunicação estabelecido neste \textit{software}.} 
 	\begin{tabular}{|c|c|c|}
 		
 		\hline 
-		\textbf{Operação} & \textbf{Cod. da Operação} & \textbf{Qtd. de Parâmetros}  \\ 
+		\textbf{Operação} & \textbf{Código da Operação} & \textbf{Quantidade de Parâmetros}  \\ 
 		\hline 
 		Enviar Hora (Eleição) & 1001 & 4 \\ 
 		\hline 
@@ -139,7 +130,30 @@ Para realizar a comunicação entre os dispositivos, com o auxílio do Java, foi de
 	
 \end{center}
 
+A tabela possui 3 colunas: Operação, Código da Operação e Quantidade de Parâmetros. Operação diz respeito as ações que podem ser executadas pelos dispositivos. A coluna seguinte denota o código que identifica a operação. Por fim, a última coluna informa sobre quantidade de parâmetros enviados em uma dada operação.
+
 \section{Resultados}\label{resl}
+
+A primeira versão do sistema foi construída, levando em consideração os requisitos 
+
+%\begin{figure}[tbph]
+%	\centering
+%	\includegraphics[scale=0.7]{figure/tela_inicial}
+%	\caption{\textit{TimeSynchronizer} em funcionamento.}
+%	\label{fig:telainicial}
+%\end{figure}
+
+
+\begin{figure}[h]
+	
+	\center
+	\subfigure[dis1][Relógio do Dispositivo 1]{\includegraphics[scale = 0.6]{dis1.png}}
+	\qquad
+	\subfigure[Relógio do Dispositivo 2]{\includegraphics[scale = 0.6]{dis2.png}}
+	\caption{Imagens do TimeSynchronizer.}
+	\label{sistemaimgs}
+	
+\end{figure}
 
 \section{Conclusões}\label{concl}
 

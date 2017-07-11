@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.Random;
 
 /**
  * Esta classe é abstração para a comunicação entre os dispositivos para
@@ -21,6 +22,7 @@ public class ClienteTimeSynchronizer {
     private static int hora;
     private static int min;
     private static int seg;
+    private static long maxRTT = 0;
     private static boolean atualizarHora = false;
     private static boolean executarEleicao = true;
     private static boolean responderamEleicao = false;
@@ -114,11 +116,13 @@ public class ClienteTimeSynchronizer {
      * @param id identificação de quem venceu
      */
     public void vencedorEleicao(String id) {
+        
         System.out.println(id + " é o Coordenador");
         byte dados[] = ("1005" + ";" + id).getBytes();
         DatagramPacket msgPacket = new DatagramPacket(dados, dados.length, endereco, porta);
         try {
-            conexao.send(msgPacket);
+            conexao.send(msgPacket);     
+            
         } catch (IOException ex) {
         }
     }
@@ -202,6 +206,11 @@ public class ClienteTimeSynchronizer {
     public void setCoordenador(String novoCoordenador) {
         ClienteTimeSynchronizer.coordenador = novoCoordenador;
     }
+    
+    public long getMaxRTT(){
+        System.out.println("RTT máximo: "+maxRTT + " ms");
+        return ClienteTimeSynchronizer.maxRTT;
+    }
 
     /**
      * Classe interna responsavel por identificar os pacotes na rede.
@@ -233,11 +242,12 @@ public class ClienteTimeSynchronizer {
                         String[] dadosRecebidos = msg.split(";");
 
                         System.out.println("Atualização pelo Coordenador " + ClienteTimeSynchronizer.coordenador);
-
+                        
                         ClienteTimeSynchronizer.hora = Integer.parseInt(dadosRecebidos[1].trim());
                         ClienteTimeSynchronizer.min = Integer.parseInt(dadosRecebidos[2].trim());
                         ClienteTimeSynchronizer.seg = Integer.parseInt(dadosRecebidos[3].trim());
-
+                        
+                        
                     } else if (msg.startsWith("1003")) {
                         String[] dadosRecebidos = msg.split(";");
                         int resulthora = Integer.parseInt(dadosRecebidos[2].trim()) - ClienteTimeSynchronizer.hora;
@@ -265,9 +275,12 @@ public class ClienteTimeSynchronizer {
                     } else if (msg.startsWith("1005")) {
                         String[] dadosRecebidos = msg.split(";");
                         ClienteTimeSynchronizer.coordenador = dadosRecebidos[1].trim();
+                        Random rd = new Random();
+                        
+                        maxRTT = 100 + rd.nextInt(1000);
                     }
 
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 }
             } catch (Exception exc) {
 

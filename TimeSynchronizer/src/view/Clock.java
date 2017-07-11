@@ -174,7 +174,7 @@ public class Clock extends javax.swing.JFrame {
     }
     
     /**
-     * Thread que realiza a sincornização com os outros relógios.
+     * Thread que realiza a sincronização com os outros relógios.
      */
     
     public void sincronizar() {
@@ -188,7 +188,7 @@ public class Clock extends javax.swing.JFrame {
 
                 while (true) {
                     try {
-                        Thread.sleep(5*1000);
+                        Thread.sleep(1*1000);
                         int horatemp = controller.getHora();
                         int mintemp = controller.getMin();
                         int segtemp = controller.getSeg();
@@ -196,16 +196,29 @@ public class Clock extends javax.swing.JFrame {
                         int resultmin = mintemp - min;
                         int resultseg = segtemp - seg;
 
-                        if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
-                            controller.enviarHora(hora, min, seg);
+                        if(controller.getCoordenador().equals(id)){
                             controller.vencedorEeicao(id);
-                        } else {
+                            if(controller.getMaxRTT()/1000 > 1){
+                                seg = seg + 1;
+                                controller.enviarHora(hora, min, seg);
+                            }
+                            else{
+                            controller.enviarHora(hora, min, seg);
+                        }
+                            
+                            
+                        } else{
+                            if(resulthora < 0 || (resulthora == 0 && resultmin < 0) || (resulthora == 0 && resultmin == 0 && resultseg < 0)){
+                            controller.vencedorEeicao(id);
+                            controller.enviarHora(hora, min, seg);
+                        } else{
                             hora = horatemp;
                             min = mintemp;
-                            seg = segtemp;
+                            seg = segtemp; 
+                            }
                         }
-                        
-//                        if (controller.getCoordenador().equals(id)) {
+ 
+//                        if () {
 //                            
 //                        } else{
 //                            
