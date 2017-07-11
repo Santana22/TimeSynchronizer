@@ -56,7 +56,7 @@ Desse modo, o presente documento apresenta os conhecimentos necessários para a c
 
 Diante da demanda estabelecida, é imediato iniciar o desenvolvimento do sistema com a definição da arquitetura. Se para que a sincronização dos relógios aconteça, os dispositivos devem conectar-se entre si. Desse modo, o modelo Cliente/Cliente deverá ser utilizado.
 
-O modelo Cliente/Cliente é amplamente utilizado em arquiteturas distribuídas ou descentralizadas. Isto não significa que não exista um servidor, significa que a posse desta função é dinâmica, ao contrário do modelo Cliente/Servidor que é estática. Assim, a depender das configurações, estado e objetivos, por exemplo, há troca de servidores. Receba também a denominação Peer-to-Peer (P2P) \cite{kurose2010}. 
+O modelo Cliente/Cliente é amplamente utilizado em arquiteturas distribuídas ou descentralizadas. Isto não significa que não exista um servidor, significa que a posse desta função é dinâmica, ao contrário do modelo Cliente/Servidor que é estática. Assim, a depender das configurações, estado e objetivos, por exemplo, há troca no cargo de servidores. Recebe também a denominação Peer-to-Peer (P2P) \cite{kurose2010}. 
 
 Outro ponto importante no projeto é a escolha da linguagem de programação. Para o desenvolvimento deste sistema foi escolhida a linguagem Java. A codificação em Java permite um ganho ímpar em portabilidade. Desse modo, independente da plataforma de Sistema Operacional (\textit{Windows}, \textit{Linux} ou \textit{MacOS}), a aplicação funcionará, exigindo apenas a instalação da máquina virtual fornecida pelo Java. Em outras palavras, isso significa praticidade e redução nos custos do projeto \cite{caelum2017}. 
 
@@ -83,15 +83,61 @@ Neste plano, o algoritmo contido no \textit{Berkley Software Distribuition} (BSD
 Com o objetivo de adaptar o algoritmo para o desenvolvimento do sistema proposto, duas modificações foram feitas: 
 
 \begin{itemize}
-	\item[1º] A escolha do coordenador é baseada em critérios que garantem a monotonicidade temporal.
-	\item[2º] O coordenador envia sua estampa de tempo, em períodos fixos, para que todos os dispositivos mantenham-se sincronizados.
+	\item[1º)] A escolha do coordenador é baseada em critérios que garantem a monotonicidade temporal. Em outras palavras, coordenadores (servidores dinâmicos) são aqueles cuja estampa de tempo é a maior entre as demais, momentaneamente.
+	\item[2º)] O coordenador envia sua estampa de tempo em períodos fixos. Deste modo, todos os dispositivos constantemente são sincronizados.
 \end{itemize}
 
-Desse modo, seguiu-se o critério de avaliar qual dispositivo possuía a maior estampa de tempo naquele momento 
+\subsection{Algoritmo de Eleição}
+
+As partes integrantes de um sistema distribuído necessitam manter certo nível de organização, não sendo diferente no desenvolvimento desta solução. Um modo de manter a organização é a existência de hierarquia. Desse modo, é preciso determinar, mesmo que por um instante ou não, quem será responsável por enviar as estampas e quem as receberá. Na literatura, esta coordenação é provida por um algoritmo de eleição.
+
+O objetivo mais simples desta classe é permitir que alguém possa conduzir a realização de uma determinada tarefa. Não obstante, é fornecido também uma modo para identificar possíveis falhas e providências. Aqui, falha é compreendida como a não resposta do coordenador corrente ou estampa de tempo enviada sem assegurar a monotonicidade do tempo. Na arquitetura proposta, foi escolhido a utilização do Algoritmo de \textit{Bully} (tradução livre, Valentão), com modificações \cite{coulouris2012}.
+
+O algoritmo define três tipos básico de mensagens. A primeira é uma convocatória para a realização de uma eleição. A segunda consiste de uma resposta para um pedido de eleição. Por fim, uma mensagem que notifica o vencedor da eleição que, em outras palavras, será o coordenador.
+
+Para avaliar o funcionamento, é importante considerar a existência de um processo $P$ que pode ter se recuperado de uma falha ou identificou a ocorrência de uma falha. As seguintes ações são possíveis \cite{wikibully2017}:
+
+%If P has the highest process id, it sends a Victory message to all other processes and becomes the new Coordinator. Otherwise, P broadcasts an Election message to all other processes with higher process IDs than itself.
+%If P receives no Answer after sending an Election message, then it broadcasts a Victory message to all other processes and becomes the Coordinator.
+%If P receives an Answer from a process with a higher ID, it sends no further messages for this election and waits for a Victory message. (If there is no Victory message after a period of time, it restarts the process at the beginning.)
+%If P receives an Election message from another process with a lower ID it sends an Answer message back and starts the election process at the beginning, by sending an Election message to higher-numbered processes.
+%If P receives a Coordinator message, it treats the sender as the coordinator.
+
+\begin{itemize}
+	\item Se $P$ possui a maior identificação (neste caso, estampa de tempo), ele envia uma mensagem de vitória. Caso contrário, somente os que possuem maiores identificações são notificados sobre a eleição.
+	\item Se $P$ não recebe nenhuma resposta após o início de uma eleição, então ele envia uma mensagem de vitória.
+	\item Se $P$ recebe uma resposta de um processo com maior identificação, $P$ não enviará mais mensagens e aguardará uma mensagem de vitória. (Caso não haja mensagem de vitória, o processo é reiniciado).
+	\item Se $P$ recebe uma mensagem de eleição de um processo com menor identificação, $P$ envia uma resposta e inicia uma nova eleição. 
+	\item Se $P$ recebe uma mensagem que possui uma estampa de tempo, $P$ trata o remetente como coordenador.
+\end{itemize} 
+
+Na implementação corrente, quando $P$ identifica a ocorrência de falha, este assume o papel de coordenador. Caso $P$ seja de fato o coordenador, não há modificações. Caso contrário, o sistema vai ajustando até encontrar o verdadeiro coordenador. Tal configuração dá mais dinâmica e permite sincronizar mais rapidamente os dispositivos.
 
 \subsection{Implementação Cliente/Cliente}
 
-Para o desenvolvimento 
+Para realizar a comunicação entre os dispositivos, com o auxílio do Java, foi definido um grupo de \textit{multicast}. Este compreende os interessados em enviar e receber mensagens. Além disto, \textit{Threads} e o protocolo de transporte UDP foram utilizados também. No aspecto comunicativo, é importante que os dispositivos possam se comunicar de maneira eficiente e padronizada. Desse modo, é importante definir um protocolo de comunicação. As informações estão na Tabela 1.
+
+\begin{center}
+	\textbf{Tabela 1. Protocolo de comunicação estabelecido neste \textit{software}.} 
+	\begin{tabular}{|c|c|c|}
+		
+		\hline 
+		\textbf{Operação} & \textbf{Cod. da Operação} & \textbf{Qtd. de Parâmetros}  \\ 
+		\hline 
+		Enviar Hora (Eleição) & 1001 & 4 \\ 
+		\hline 
+		Enviar Hora & 1002 & 3 \\ 
+		\hline 
+		Realizar Eleição & 1003  & 4 \\ 
+		\hline 
+		Responder Eleição & 1004  & 2 \\ 
+		\hline
+		Vencedor Eleição & 1005 & 1 \\ 
+		\hline  
+		
+	\end{tabular}  
+	
+\end{center}
 
 \section{Resultados}\label{resl}
 
@@ -100,12 +146,14 @@ Para o desenvolvimento
 \bibliographystyle{sbc}
 \begin{thebibliography}{}
 	
-\bibitem[Caelum 2017]{caelum2017} Caelum (2017). \newblock Java e {O}rientação a {O}bjetos - {C}urso {FJ} - 11. Disponível em: \textless www.caelum.com.br/apostilas\textgreater. Acesso em: 8 jun. 2017. 
+\bibitem[Caelum 2017]{caelum2017} Caelum (2017). \newblock Java e {O}rientação a {O}bjetos - {C}urso {FJ} - 11. Disponível em: \textless www.caelum.com.br/apostilas\textgreater. Acesso em: 8 julho 2017. 
 	
-\bibitem[Kurose e Ross 2010]{kurose2010} F. Kurose e K. Ross (2010). Redes de computadores e a {I}nternet: uma abordagem top-down. 5 ed. São Paulo: Pearson.
+\bibitem[Kurose e Ross 2010]{kurose2010} Kurose, F. e Ross, K. (2010). \textit{Redes de computadores e a {I}nternet: uma abordagem top-down}. 5 ed. São Paulo: Pearson.
 
-\bibitem[Coulouris \textit{et. al.} 2012]{coulouris2012} G. Coulouris, J. Dollimore, T. Kindberg e G. Blair (2012). Distributed {S}ystems:
-{C}oncepts and {D}esign. 5 ed. Boston: Pearson.
+\bibitem[Coulouris et. al. 2012]{coulouris2012} Coulouris, G., Dollimore, J., Kindberg, T. e Blair, G. (2012). \textit{Distributed {S}ystems:
+{C}oncepts and {D}esign}. 5 ed. Boston: Pearson.
+
+\bibitem[Wikipedia, 2017]{wikibully2017} Wikipedia (2017). Bully algorithm. Disponível em: \textless https://en.wikipedia.org/wiki/Bully\_algorithm\textgreater. Acesso em: 26 junho 2017. 
 
 \end{thebibliography}
 %\bibliography{sbc-template}
