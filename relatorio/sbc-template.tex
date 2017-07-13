@@ -28,10 +28,9 @@
      
 \begin{resumo} 
 
+O presente documento aborda o desenvolvimento do \textit{TimeSynchronizer}, uma solução distribuída com o intuito de sincronizar, aproximadamente, um grupo de relógios físicos, garantindo a monotonicidade temporal. Para isto, conceitos pertinentes sobre Sistemas Distribuídos, Sincronização, Algoritmos de Eleição e arquitetura Cliente/Cliente foram aplicados.  
+
 \end{resumo}
-
-
-
 
 \section{Introdução}
 
@@ -63,13 +62,20 @@ A concorrência no uso dos componentes é uma realidade quase que inevitável em um
 
 Falhas podem acontecer a qualquer instante e é importante que seja dimensionado três itens: identificação das falhas, ações de emergência e os impactos. Assim, por exemplo, mensagens podem não ser recebidas ou atrasarem e os processos podem finalizar de maneira inesperada (\textit{crash}). Em qualquer situação, o sistema deve continuar funcionando corretamente.
 
-A ausência de um relógio comum tem início em dois problemas. O primeiro, como abordado anteriormente, é um aspecto construtivo: os dispositivos tendem a contabilizar diferente o tempo. Além disso, como é provável que os dispositivos estejam em locais distintos do mundo, questões de fuso horário são pertinentes. Neste cenário, é natural que aconteçam diferenças. Em sistemas nos quais o tempo é um elemento crucial, isto pode inviabilizar o funcionamento. Neste contexto, o uso de mensagens e a noção de causalidade (um evento só pode acontecer após o acontecimento de um determinado evento anterior) é indispensável. Mas, se a sincronização for inevitável, é importante lançar mão de alguma estratégia.
+A ausência de um relógio comum justifica-se em dois aspectos. O primeiro, como abordado anteriormente, é um aspecto construtivo: os dispositivos tendem a contabilizar diferente o tempo. Além disso, como é provável que os dispositivos estejam em locais distintos do mundo, questões de fuso horário são pertinentes. Neste cenário, é natural que aconteçam diferenças. Em sistemas nos quais tempo é um elemento crucial, isto pode inviabilizar o funcionamento. Neste contexto, o uso de mensagens e a noção de causalidade (um evento só pode acontecer após o acontecimento de um determinado evento anterior) é indispensável. Mas, se a sincronização for inevitável, é importante lançar mão de alguma estratégia.
 
 \subsection{Sincronização Temporal em Sistemas Distribuídos}
 
-O grande trunfo da sincronização temporal, nos sistemas distribuídos, é fazer com que os componentes concordem com uma determinada hora, não necessariamente a hora tida como correta. Não obstante, para haver consistência temporal, é importante que a política seja mantida. 
+O grande trunfo da sincronização temporal, nos sistemas distribuídos, é fazer com que os componentes concordem com uma determinada hora, não necessariamente a hora tida como a correta. Não obstante, para haver consistência temporal, é importante que a política seja mantida. 
 
-Neste plano, o algoritmo contido no \textit{Berkley Software Distribuition} (BSD) é uma solução elegante. Quando uma sincronização é necessária, um coordenador (escolhido previamente e que atende ao conceito de servidor dinâmico) solicita que os dispositivos enviem suas estampas de tempo. Ao receber, o mesmo avalia cada estampa com a própria e responde com o ajuste que cada dispositivo deve fazer para manter-se sincronizado. Assim, a concordância temporal é alcançada \cite{coulouris2012}. Entretanto, esta solução permite que tempo possa avançar ou retroceder, pois o ajuste mantém relação de dependência com quem ocupa o cargo de coordenador. Em aplicações críticas, tal comportamento temporal é indesejado.
+Neste plano, o algoritmo contido no \textit{Berkley Software Distribuition} (BSD) é uma solução elegante (Figura \ref{fig:bsd}). Quando uma sincronização é necessária, um coordenador (escolhido previamente e que atende ao conceito de servidor dinâmico) envia sua estampa aos outros dispositivos e estes respondem com a diferença. Por fim, o coordenador avalia as diferenças recebidas e responde com o ajuste que cada dispositivo deve fazer para manter-se sincronizado. Assim, a concordância temporal é alcançada \cite{coulouris2012}. Entretanto, esta solução permite que tempo possa avançar ou retroceder, pois o ajuste mantém relação de dependência com quem ocupa o cargo de coordenador. Em aplicações críticas, tal comportamento temporal é indesejado.
+
+\begin{figure}[tbph]
+	\centering
+	\includegraphics[scale=1]{bsd.png}
+	\caption{(a) O coordenador envia seu horário aos outros dispositivos. (b) Os dispositivos respondem com a diferença. (c) O coordenador envia qual ajuste deve ser feito \cite{tannem2007}.}
+	\label{fig:bsd}
+\end{figure}
 
 Com o objetivo de adaptar o algoritmo para o desenvolvimento do sistema proposto, duas modificações foram feitas: 
 
@@ -82,11 +88,11 @@ Com o objetivo de adaptar o algoritmo para o desenvolvimento do sistema proposto
 
 As partes integrantes de um sistema distribuído necessitam manter certo nível de organização. Um modo de manter a organização é a existência de hierarquia. Desse modo, é preciso determinar, mesmo que por um instante ou não, quem será responsável por enviar as estampas e quem as receberá. Na literatura, esta coordenação é provida por um algoritmo de eleição.%não sendo diferente no desenvolvimento desta solução. 
 
-O objetivo mais simples desta classe é permitir que alguém possa conduzir a realização de uma determinada tarefa. Não obstante, é fornecido também uma modo para identificar possíveis falhas e providências. Aqui, falha é compreendida como a não resposta do coordenador corrente ou estampa de tempo enviada sem assegurar a monotonicidade do tempo. Na arquitetura proposta, foi escolhido a utilização do Algoritmo de \textit{Bully} (tradução livre, Valentão), com modificações \cite{coulouris2012}.
+O objetivo mais simples desta classe é permitir que alguém possa conduzir a realização de uma determinada tarefa. Não obstante, é fornecido também uma modo para identificar possíveis falhas e providências. Aqui, falha é compreendida como a não resposta do coordenador corrente ou estampa de tempo enviada sem assegurar a monotonicidade do tempo. Na arquitetura proposta, foi escolhido a utilização do Algoritmo de \textit{Bully} (tradução livre, Valentão), com modificações \cite{coulouris2012}, \cite{tannem2007}.
 
 O algoritmo define três tipos básico de mensagens. A primeira é uma convocatória para a realização de uma eleição. A segunda consiste de uma resposta para um pedido de eleição. Por fim, uma mensagem que notifica o vencedor da eleição que, em outras palavras, será o coordenador.
 
-Para avaliar o funcionamento, é importante considerar a existência de um processo $P$ que pode ter se recuperado de uma falha ou identificou a ocorrência de uma falha. As seguintes ações são possíveis \cite{wikibully2017}:
+Para avaliar o funcionamento, é importante considerar a existência de um processo $P$ que pode ter se recuperado de uma falha ou identificou a ocorrência de uma falha. As seguintes ações são possíveis \cite{coulouris2012}, \cite{tannem2007}, \cite{wikibully2017}:
 
 %If P has the highest process id, it sends a Victory message to all other processes and becomes the new Coordinator. Otherwise, P broadcasts an Election message to all other processes with higher process IDs than itself.
 %If P receives no Answer after sending an Election message, then it broadcasts a Victory message to all other processes and becomes the Coordinator.
@@ -101,8 +107,7 @@ Para avaliar o funcionamento, é importante considerar a existência de um process
 	\item Se $P$ recebe uma mensagem de eleição de um processo com menor identificação, $P$ envia uma resposta e inicia uma nova eleição. 
 	\item Se $P$ recebe uma mensagem que possui uma estampa de tempo, $P$ trata o remetente como coordenador.
 \end{itemize} 
-
-Na implementação corrente, quando $P$ identifica a ocorrência de falha, este assume o papel de coordenador. Caso $P$ seja de fato o coordenador, não há modificações. Caso contrário, o sistema vai ajustando até encontrar o verdadeiro coordenador. Tal configuração dá mais dinâmica e permite sincronizar mais rapidamente os dispositivos.
+Na implementação corrente, quando $P$ identifica a ocorrência de falha, este assume o papel de coordenador, sem iniciar uma eleição. Caso $P$ seja de fato o coordenador, não há modificações. Caso contrário, o sistema vai ajustando-se até encontrar o verdadeiro coordenador. Tal configuração dá mais dinâmica e permite sincronizar mais rapidamente os dispositivos.
 
 \subsection{Implementação Cliente/Cliente}
 
@@ -111,7 +116,6 @@ Para realizar a comunicação entre os dispositivos, com o auxílio do Java, foi de
 \begin{center}
 	\textbf{Tabela 1. Protocolo de comunicação estabelecido neste \textit{software}.} 
 	\begin{tabular}{|c|c|c|}
-		
 		\hline 
 		\textbf{Operação} & \textbf{Código da Operação} & \textbf{Quantidade de Parâmetros}  \\ 
 		\hline 
@@ -125,16 +129,15 @@ Para realizar a comunicação entre os dispositivos, com o auxílio do Java, foi de
 		\hline
 		Vencedor Eleição & 1005 & 1 \\ 
 		\hline  
-		
 	\end{tabular}  
-	
+	\textbf{\\ Fonte: Autor.}
 \end{center}
 
 A tabela possui 3 colunas: Operação, Código da Operação e Quantidade de Parâmetros. Operação diz respeito as ações que podem ser executadas pelos dispositivos. A coluna seguinte denota o código que identifica a operação. Por fim, a última coluna informa sobre quantidade de parâmetros enviados em uma dada operação.
 
 \section{Resultados}\label{resl}
 
-A primeira versão do sistema foi construída, levando em consideração os requisitos 
+A primeira versão do sistema, denominado \textit{TimeSynchronizer}, foi construída, levando em consideração os requisitos solicitados. Testes foram executados e os resultados obtidos foram satisfatórios. As Figuras 3(a) e 3(b) apresentam dois dispositivos que possuem as estampas de tempo sincronizadas.  %no Laboratório de Redes e Sistemas Distribuídos
 
 %\begin{figure}[tbph]
 %	\centering
@@ -144,18 +147,27 @@ A primeira versão do sistema foi construída, levando em consideração os requisit
 %\end{figure}
 
 
-\begin{figure}[h]
-	
+
+\begin{figure}[htpb]
 	\center
-	\subfigure[dis1][Relógio do Dispositivo 1]{\includegraphics[scale = 0.6]{dis1.png}}
+	\subfigure[dis1][Relógio do Dispositivo 1]{\includegraphics[scale = 0.65]{dis1.png}}
 	\qquad
-	\subfigure[Relógio do Dispositivo 2]{\includegraphics[scale = 0.6]{dis2.png}}
-	\caption{Imagens do TimeSynchronizer.}
+	\subfigure[Relógio do Dispositivo 2]{\includegraphics[scale = 0.65]{dis2.png}}
+	\caption{Imagens do \textit{TimeSynchronizer}.}
 	\label{sistemaimgs}
-	
 \end{figure}
 
+Ao iniciar a execução, é solicitado que o usuário informe uma identificação para o novo relógio. Logo após, a estampa de tempo  inicial (formato HH:MM:SS) e o \textit{drift}. O \textit{drift} corresponde ao quão rápida ou lenta é uma contagem. Este parâmetro serve para modelar as características construtivas dos dispositivos. Quanto mais próximo de $0$, mais rápida é contabilização do tempo. Para uma contagem regular, o \textit{drift} deve ser $1$.
+
+Após as configurações iniciais, a sincronização tem inicio. Ele é efetuada a cada $5$ segundos. A \textit{thread} associada é responsável por: identificar falhas, modificar coordenador e enviar/receber estampas. Outra \textit{thread} é responsável por efetuar a contagem e exibição da estampa. Por conta da interface minimalista, o estado do sistema é exibido por meio do console para rastrear as ações.
+
+Um outro aspecto considerado na sincronização é o tempo entre o envio e o recebimento da resposta de uma mensagem - \textit{Round-Trip Time} (RTT). Nesta solução, o cálculo do RTT é simulado e pode estar entre $100$ e $1100$ milissegundos (típico de redes locais e das de longas distâncias).  A simulação é feita para avaliar o comportamento do sistema quando os atrasos de rede são pertinentes. Por aspectos de projeto, quando o RTT é maior ou igual a $1000$ milissegundos, há compensação na estampa de tempo enviada (adiciona-se mais um segundo).
+
 \section{Conclusões}\label{concl}
+
+A formação de um profissional de Engenharia de Computação deve buscar ao máximo o desenvolvimento de habilidades e competências que o auxiliem em qualquer ambiente adverso. Neste contexto, insere-se a construção e/ou administração de Sistemas Distribuídos.
+
+Não obstante, foi desenvolvido o \textit{TimeSynchronizer}. Este é uma solução distribuída para a sincronização aproximada de um grupo definido de relógios físicos que é capaz de tratar falhas (\textit{crashes} de coordenador, atrasos de redes, dentre outros). As informações sobre o estado do sistema são apresentados nas interfaces gráfica e de comando. De modo geral, os resultados obtidos foram satisfatórios. No aspecto de melhorias, é sugerido fazer o cálculo real do RTT. 
 
 \bibliographystyle{sbc}
 \begin{thebibliography}{}
@@ -168,6 +180,8 @@ A primeira versão do sistema foi construída, levando em consideração os requisit
 {C}oncepts and {D}esign}. 5 ed. Boston: Pearson.
 
 \bibitem[Wikipedia, 2017]{wikibully2017} Wikipedia (2017). Bully algorithm. Disponível em: \textless https://en.wikipedia.org/wiki/Bully\_algorithm\textgreater. Acesso em: 26 junho 2017. 
+
+\bibitem[Tannembaum e Steen 2007]{tannem2007} Tanenbaum, A. S., Steen, M. V. (2007)\textit{ Distributed {S}ystems: Principles and Paradims.} 2 ed. Upper Saddle River: Pearson-Pretice Hall.
 
 \end{thebibliography}
 %\bibliography{sbc-template}

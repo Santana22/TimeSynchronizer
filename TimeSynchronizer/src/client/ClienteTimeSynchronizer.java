@@ -242,7 +242,7 @@ public class ClienteTimeSynchronizer {
                         String[] dadosRecebidos = msg.split(";");
 
                         System.out.println("Atualização pelo Coordenador " + ClienteTimeSynchronizer.coordenador);
-                        
+                        System.out.println("Hora: " + Integer.parseInt(dadosRecebidos[1].trim()) + " Min: " + Integer.parseInt(dadosRecebidos[2].trim()) + " Seg: " + Integer.parseInt(dadosRecebidos[3].trim()));
                         ClienteTimeSynchronizer.hora = Integer.parseInt(dadosRecebidos[1].trim());
                         ClienteTimeSynchronizer.min = Integer.parseInt(dadosRecebidos[2].trim());
                         ClienteTimeSynchronizer.seg = Integer.parseInt(dadosRecebidos[3].trim());
