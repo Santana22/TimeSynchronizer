@@ -23,12 +23,11 @@
 \maketitle
 
 \begin{abstract}
-  
+The present document shows the development of \textit{TimeSynchronizer}, a distributed solution with objective to synchronize, approximately, a group of physical clocks, without time's throwbacks. For that, concepts about Distributed Systems, Synchronization, Elections' Algorithms and Peer/Peer architecture, important to the project, are discussed.
 \end{abstract}
-     
-\begin{resumo} 
 
-O presente documento aborda o desenvolvimento do \textit{TimeSynchronizer}, uma solução distribuída com o intuito de sincronizar, aproximadamente, um grupo de relógios físicos, garantindo a monotonicidade temporal. Para isto, conceitos pertinentes sobre Sistemas Distribuídos, Sincronização, Algoritmos de Eleição e arquitetura Cliente/Cliente foram aplicados.  
+\begin{resumo} 
+O presente documento aborda o desenvolvimento do \textit{TimeSynchronizer}, uma solução distribuída com o intuito de sincronizar, aproximadamente, um grupo de relógios físicos, garantindo a monotonicidade temporal. Para isto, conceitos pertinentes sobre Sistemas Distribuídos, Sincronização, Algoritmos de Eleição e arquitetura Cliente/Cliente, utilizados no projeto, são discutidos. 
 
 \end{resumo}
 
@@ -44,7 +43,7 @@ Desse modo, o presente documento apresenta os conhecimentos necessários para a c
 
 \section{Desenvolvimento} \label{desen}
 
-Diante da demanda estabelecida, é imediato iniciar o desenvolvimento do sistema com a definição da arquitetura. Se para que a sincronização dos relógios aconteça, os dispositivos devem conectar-se entre si. Desse modo, o modelo Cliente/Cliente deverá ser utilizado.
+Diante da demanda estabelecida, é imediato iniciar o desenvolvimento do sistema com a definição da arquitetura. Para que a sincronização dos relógios aconteça, os dispositivos devem conectar-se entre si. Desse modo, o modelo Cliente/Cliente deverá ser utilizado.
 
 O modelo Cliente/Cliente é amplamente utilizado em arquiteturas distribuídas ou descentralizadas. Isto não significa que não exista um servidor, significa que a posse desta função é dinâmica, ao contrário do modelo Cliente/Servidor que é estática. Assim, a depender das configurações, estado e objetivos, por exemplo, há troca no cargo de servidores. Recebe também a denominação Peer-to-Peer (P2P) \cite{kurose2010}. 
 
@@ -150,7 +149,7 @@ A primeira versão do sistema, denominado \textit{TimeSynchronizer}, foi construí
 
 \begin{figure}[htpb]
 	\center
-	\subfigure[dis1][Relógio do Dispositivo 1]{\includegraphics[scale = 0.65]{dis1.png}}
+	\subfigure[Relógio do Dispositivo 1]{\includegraphics[scale = 0.65]{dis1.png}}
 	\qquad
 	\subfigure[Relógio do Dispositivo 2]{\includegraphics[scale = 0.65]{dis2.png}}
 	\caption{Imagens do \textit{TimeSynchronizer}.}
